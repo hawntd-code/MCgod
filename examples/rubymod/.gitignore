@@ -1,0 +1,9 @@
+# Salidas de Gradle y del juego
+/build/
+/.gradle/
+/run/*
+!/run/options.txt
+!/run/server.properties
+!/run/servers.dat
+/.mcreator/
+/.eclipse/

@@ -1,0 +1,113 @@
+{
+  "mod_elements": [
+    {
+      "name": "Ruby",
+      "type": "item",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ruby",
+      "metadata": {
+        "files": [
+          "src/main/java/net/mcreator/rubymod/item/RubyItem.java",
+          "src/main/resources/assets/rubymod/models/item/ruby.json"
+        ]
+      },
+      "path": "~/Rubí"
+    },
+    {
+      "name": "RubyBlock",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ruby_block",
+      "path": "~/Rubí"
+    },
+    {
+      "name": "RubyOre",
+      "type": "block",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ruby_ore",
+      "path": "~/Rubí"
+    },
+    {
+      "name": "RubyPickaxe",
+      "type": "tool",
+      "compiles": false,
+      "locked_code": false,
+      "registry_name": "ruby_pickaxe"
+    },
+    {
+      "name": "RubyBlockRecipe",
+      "type": "recipe",
+      "compiles": true,
+      "locked_code": false,
+      "registry_name": "ruby_block_recipe"
+    },
+    {
+      "name": "GlowOnStep",
+      "type": "procedure",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "glow_on_step"
+    },
+    {
+      "name": "RubyUtils",
+      "type": "code",
+      "compiles": true,
+      "locked_code": true,
+      "registry_name": "ruby_utils"
+    }
+  ],
+  "variable_elements": [
+    {
+      "name": "rubiesMined",
+      "type": "number",
+      "scope": "PLAYER_PERSISTENT",
+      "value": "0"
+    }
+  ],
+  "sound_elements": [],
+  "tag_elements": {
+    "BLOCKS:minecraft:mineable/pickaxe": [
+      "~CUSTOM:RubyOre",
+      "~CUSTOM:RubyBlock"
+    ]
+  },
+  "tab_element_order": {},
+  "language_map": {
+    "en_us": {
+      "item.rubymod.ruby": "Ruby",
+      "block.rubymod.ruby_block": "Block of Ruby"
+    },
+    "es_mx": {
+      "item.rubymod.ruby": "Rubí",
+      "block.rubymod.ruby_block": "Bloque de rubí"
+    }
+  },
+  "foldersRoot": {
+    "name": "~",
+    "children": [
+      {
+        "name": "Rubí",
+        "children": []
+      }
+    ]
+  },
+  "workspaceSettings": {
+    "modid": "rubymod",
+    "modName": "Ruby Mod",
+    "version": "1.0.0",
+    "description": "Workspace de ejemplo para las pruebas de MCgod",
+    "author": "MCgod",
+    "license": "GPL-3.0",
+    "serverSideOnly": false,
+    "requiredMods": [],
+    "dependencies": [],
+    "dependants": [],
+    "mcreatorDependencies": [],
+    "currentGenerator": "neoforge-1.21.1",
+    "modElementsPackage": "net.mcreator.rubymod"
+  },
+  "mcreatorVersion": 202500315219
+}

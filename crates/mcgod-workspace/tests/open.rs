@@ -182,6 +182,15 @@ fn folder_errors() {
 }
 
 #[test]
+fn knows_whether_the_project_can_run_gradle() {
+    assert!(!Workspace::open(fixture()).unwrap().summary().has_gradle);
+    let example = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples/rubymod");
+    let summary = Workspace::open(example).unwrap().summary();
+    assert!(summary.has_gradle);
+    assert_eq!(summary.modid, "rubymod");
+}
+
+#[test]
 fn generator_id_parsing() {
     let g = GeneratorId::parse("datapack-26.3.x");
     assert_eq!(g.flavor, "datapack");

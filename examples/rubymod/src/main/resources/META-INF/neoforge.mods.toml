@@ -1,0 +1,33 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="GPL-3.0"
+
+[[mods]]
+modId="rubymod"
+version="1.0.0"
+displayName="Ruby Mod"
+authors="MCgod"
+description="Workspace de ejemplo para las pruebas de MCgod"
+
+# Start of user code block mod configuration
+# End of user code block mod configuration
+
+# Start of user code block custom mixins
+# End of user code block custom mixins
+
+[[dependencies.rubymod]]
+    modId="neoforge"
+    type="required"
+    versionRange="[21.1.265,)"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.rubymod]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21.1]"
+    ordering="AFTER"
+    side="BOTH"
+
+# Start of user code block dependencies configuration
+# End of user code block dependencies configuration

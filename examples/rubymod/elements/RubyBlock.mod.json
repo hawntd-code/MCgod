@@ -1,0 +1,21 @@
+{
+  "_fv": 92,
+  "_type": "block",
+  "definition": {
+    "name": "Block of Ruby",
+    "hardness": 5.0,
+    "resistance": 6.0,
+    "soundOnStep": {
+      "value": "METAL"
+    },
+    "luminance": 0,
+    "requiresCorrectTool": true,
+    "destroyTool": "pickaxe",
+    "vanillaToolTier": "IRON",
+    "creativeTabs": [
+      {
+        "value": "BUILDING_BLOCKS"
+      }
+    ]
+  }
+}

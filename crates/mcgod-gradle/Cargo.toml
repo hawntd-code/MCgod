@@ -1,0 +1,15 @@
+[package]
+name = "mcgod-gradle"
+description = "Ejecuta Gradle sobre un workspace (compilar, abrir Minecraft) y transmite su salida"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "2"
+
+[dev-dependencies]
+serde_json = "1.0"
+tempfile = "3"

@@ -10,9 +10,9 @@ const ready = (java: JavaInfo | null): EngineState => ({
   env: { appVersion: "0.1.0", os: "Windows x86_64", java },
 });
 
-const temurin21: JavaInfo = { version: "21.0.13.1", major: 21, vendor: "Temurin" };
-const java17: JavaInfo = { version: "17.0.9", major: 17, vendor: "Temurin" };
-const java25: JavaInfo = { version: "25.0.1", major: 25, vendor: null };
+const temurin21: JavaInfo = { version: "21.0.13.1", major: 21, vendor: "Temurin", home: null };
+const java17: JavaInfo = { version: "17.0.9", major: 17, vendor: "Temurin", home: null };
+const java25: JavaInfo = { version: "25.0.1", major: 25, vendor: null, home: null };
 
 describe("requisitos del primer arranque", () => {
   const c = es.onboarding.checks;

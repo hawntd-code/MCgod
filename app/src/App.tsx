@@ -11,6 +11,7 @@ import { StatusBar } from "./components/StatusBar";
 import { TopBar, type PanelKey } from "./components/TopBar";
 import { useI18n } from "./i18n";
 import { BackendProvider } from "./lib/backend-context";
+import { isRunning, useGradleRun } from "./lib/gradle-run";
 import {
   getBackend,
   readEnvironment,
@@ -19,6 +20,7 @@ import {
   type Backend,
   type EngineError,
   type EngineState,
+  type GradleTask,
   type WorkspaceSummary,
 } from "./lib/engine";
 
@@ -45,6 +47,9 @@ export function App({ backend: injected }: { backend?: Backend }) {
   const [busy, setBusy] = useState(false);
   const [tabs, setTabs] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<string>(OVERVIEW);
+
+  const gradle = useGradleRun(backend);
+  const runningTask = isRunning(gradle.run) ? gradle.run.task : null;
 
   const [activity, setActivity] = useState<Activity>("elements");
   const [open, setOpen] = useState<Record<PanelKey, boolean>>({ sidebar: true, console: true, ai: true });
@@ -93,12 +98,25 @@ export function App({ backend: injected }: { backend?: Backend }) {
     }
   }, [backend, m.projects.pickerTitle, m.projects.pickerFilter, openPath]);
 
+  const runTask = useCallback(
+    (task: GradleTask) => {
+      // La salida se ve en la consola: si estaba oculta, se muestra.
+      const panel = refs.console.current;
+      if (panel?.isCollapsed()) panel.expand();
+      void gradle.start(task);
+    },
+    // Los refs son estables entre renders, por eso no están en las dependencias.
+    [gradle.start],
+  );
+
   const closeProject = useCallback(async () => {
+    // El motor también detiene Gradle al cerrar; aquí se avisa a la interfaz.
+    if (runningTask) await gradle.stop();
     await backend.closeWorkspace().catch(() => undefined);
     setWorkspace(null);
     setTabs([]);
     setActiveTab(OVERVIEW);
-  }, [backend]);
+  }, [backend, gradle, runningTask]);
 
   const forgetRecent = useCallback(
     async (path: string) => {
@@ -188,7 +206,15 @@ export function App({ backend: injected }: { backend?: Backend }) {
   return (
     <BackendProvider backend={backend}>
       <div className="flex h-full flex-col">
-        <TopBar open={open} onToggle={toggle} projectName={workspace?.name ?? null} />
+        <TopBar
+          open={open}
+          onToggle={toggle}
+          projectName={workspace?.name ?? null}
+          canRun={workspace?.hasGradle ?? false}
+          runningTask={runningTask}
+          onRun={runTask}
+          onStop={gradle.stop}
+        />
 
         <div className="flex min-h-0 flex-1">
           <ActivityRail active={open.sidebar ? activity : null} onChange={chooseActivity} />
@@ -252,7 +278,13 @@ export function App({ backend: injected }: { backend?: Backend }) {
                   onCollapse={() => setPanelOpen("console", false)}
                   onExpand={() => setPanelOpen("console", true)}
                 >
-                  <ConsolePanel />
+                  <ConsolePanel
+                    run={gradle.run}
+                    lines={gradle.lines}
+                    dropped={gradle.dropped}
+                    onStop={gradle.stop}
+                    onClear={gradle.clear}
+                  />
                 </Panel>
               </PanelGroup>
             </Panel>
@@ -275,7 +307,7 @@ export function App({ backend: injected }: { backend?: Backend }) {
           </PanelGroup>
         </div>
 
-        <StatusBar engine={engine} workspace={workspace} />
+        <StatusBar engine={engine} workspace={workspace} gradleRunning={runningTask !== null} />
       </div>
     </BackendProvider>
   );

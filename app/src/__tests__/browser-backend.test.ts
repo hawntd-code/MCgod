@@ -19,10 +19,11 @@ describe("backend del navegador", () => {
     expect(recent[0]).toMatchObject({ path: DEMO_FILE, name: "Ruby Mod", modid: "rubymod" });
   });
 
-  it("sin modo demo, abrir proyectos pide la app de escritorio", async () => {
+  it("sin modo demo, abrir proyectos y compilar piden la app de escritorio", async () => {
     const b = createBrowserBackend(false);
     await expect(b.pickWorkspace({ title: "", filter: "" })).rejects.toMatchObject({ code: "desktopOnly" });
     await expect(b.openWorkspace("C:/x.mcreator")).rejects.toMatchObject({ code: "desktopOnly" });
+    await expect(b.runGradle("build", () => {})).rejects.toMatchObject({ code: "desktopOnly" });
   });
 
   it("distingue un elemento sin definición de uno que no existe", async () => {

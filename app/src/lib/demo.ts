@@ -30,7 +30,47 @@ export const demoSummary: WorkspaceSummary = {
   sounds: 0,
   tags: 1,
   languages: ["en_us", "es_mx"],
+  hasGradle: true,
 };
+
+/**
+ * Salida para simular Gradle en el navegador. Son líneas reales de la compilación del
+ * proyecto de ejemplo (examples/rubymod), recortadas.
+ */
+export function demoGradleOutput(task: "build" | "runClient"): string[] {
+  const build = [
+    "Calculating task graph as no cached configuration is available for tasks: build",
+    "> Task :jarJar NO-SOURCE",
+    "> Task :processTestResources NO-SOURCE",
+    "> Task :processResources",
+    "> Task :createMinecraftArtifacts",
+    "> Task :compileJava",
+    "> Task :classes",
+    "> Task :jar",
+    "> Task :assemble",
+    "> Task :build",
+    "",
+    "Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.",
+    "",
+    "BUILD SUCCESSFUL in 1m 48s",
+    "4 actionable tasks: 4 executed",
+  ];
+  if (task === "build") return build;
+  return [
+    "> Task :compileJava UP-TO-DATE",
+    "> Task :processResources UP-TO-DATE",
+    "> Task :classes UP-TO-DATE",
+    "> Task :runClient",
+    "[main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--username, Dev, --gameDir, .]",
+    "[main/INFO] [net.neoforged.fml.loading.FMLLoader/CORE]: Loading NeoForge 21.1.265 for Minecraft 1.21.1",
+    "[Render thread/INFO] [net.minecraft.client.Minecraft/]: Setting user: Dev",
+    "[Render thread/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/...' uses unexpected schema",
+    "[Render thread/INFO] [net.minecraft.client.Minecraft/]: Backend library: LWJGL version 3.3.3+5",
+    "[Render thread/INFO] [net.neoforged.fml.ModLoader/LOADING]: Loading mod rubymod",
+    "[Render thread/INFO] [net.minecraft.client.sounds.SoundEngine/SOUNDS]: Sound engine started",
+    "[Render thread/INFO] [net.minecraft.client.renderer.texture.TextureAtlas/]: Created: 1024x512x4 minecraft:textures/atlas/blocks.png-atlas",
+  ];
+}
 
 export const demoDefinitions: Record<string, ElementDefinition> = {
   Ruby: {

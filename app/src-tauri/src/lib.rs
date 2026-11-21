@@ -4,7 +4,7 @@ mod settings;
 
 use commands::AppState;
 use settings::SettingsStore;
-use tauri::Manager;
+use tauri::{Manager, RunEvent};
 
 /// Comando para la interfaz: información del entorno (versión, sistema, Java).
 #[tauri::command]
@@ -18,7 +18,7 @@ async fn environment() -> Result<environment::Environment, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
@@ -41,7 +41,16 @@ pub fn run() {
             commands::open_workspace,
             commands::close_workspace,
             commands::read_element,
+            commands::gradle_run,
+            commands::gradle_stop,
         ])
-        .run(tauri::generate_context!())
+        .build(tauri::generate_context!())
         .expect("no se pudo iniciar la aplicación");
+
+    app.run(|app, event| {
+        // Al cerrar la app no deben quedar Gradle ni Minecraft abiertos.
+        if let RunEvent::Exit = event {
+            app.state::<AppState>().stop_gradle();
+        }
+    });
 }

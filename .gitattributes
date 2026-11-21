@@ -6,6 +6,8 @@
 *.bat text eol=crlf
 
 # Binarios
+*.jar binary
+*.dat binary
 *.png binary
 *.ico binary
 *.icns binary

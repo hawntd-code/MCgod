@@ -69,7 +69,18 @@ flowchart LR
 | `mcgod-kb` | Rust | Índice y búsqueda sobre la ayuda de MCreator + documentación propia de modding |
 | `mcgod-mcp` | Rust | Servidor MCP que expone las mismas herramientas que usa el chat integrado |
 
-Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri` y `crates/mcgod-workspace`.
+Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri`, `crates/mcgod-workspace` y `crates/mcgod-gradle`.
+
+### Cómo se compila y se abre Minecraft
+
+`mcgod-gradle` llama al `gradlew` del proyecto igual que MCreator llama a Gradle (`GradleUtils.java`):
+
+- **Java fijo:** `JAVA_HOME` y `-Porg.gradle.java.installations.paths` apuntan al JDK detectado, sin autodetección.
+- **Entorno limpio:** se quitan `JAVA_TOOL_OPTIONS`, `GRADLE_OPTS`, `CI` y otras variables que cambian el resultado.
+- **Opciones de MCreator:** `-Duser.language=en` (errores en inglés, fáciles de leer) y `-Declipse.application=net.mcreator` (ModDevGradle actúa como dentro de un IDE).
+- **Salida en tandas:** cada 100 ms o 500 líneas, por un canal de Tauri. Minecraft en modo desarrollo escribe miles de líneas por segundo; la consola guarda las últimas 4,000.
+- **Detener:** se mata el árbol del proceso `gradlew`. El daemon de Gradle detecta la desconexión, cancela la tarea y cierra Minecraft (comprobado con `runClient`). El daemon sigue vivo para que la siguiente compilación arranque rápido.
+- **Una tarea a la vez.** Cerrar el proyecto, abrir otro o cerrar la app detiene la tarea en curso.
 
 ### Cómo se abre un proyecto hoy
 

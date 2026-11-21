@@ -46,6 +46,14 @@ La pantalla "Crea tu primer mod." se muestra en el primer arranque, con los requ
 
 MCgod ya lee workspaces de MCreator y muestra cada elemento tal como está guardado. Guardar cambios llega después, cuando haya pruebas de ida y vuelta con workspaces generados por MCreator. Así no hay riesgo de dañar proyectos reales.
 
+## 2026-11-21 · Gradle por línea de comandos, con las opciones de MCreator
+
+MCreator usa la Tooling API de Gradle, que es una librería de Java. MCgod llama a `gradlew` como proceso y le pasa las mismas opciones y el mismo entorno. Así no hace falta una JVM dentro de la app, y el resultado coincide con el de MCreator. Probado con el proyecto de ejemplo: compila, abre Minecraft 1.21.1 con NeoForge 21.1.265 y el mod cargado, y al detener se cierra el juego.
+
+## 2026-11-21 · Compilar y jugar antes que generar código
+
+Primero se resolvió el ciclo compilar → abrir Minecraft → ver la consola, con un proyecto de ejemplo escrito a mano a partir de las plantillas de MCreator. Así, cuando llegue el generador, su salida se prueba en el juego desde el primer día.
+
 ## 2026-11-21 · Regla de redacción sin frases genéricas
 
 Nada de muletillas, clichés de marketing ni fórmulas típicas de texto generado por IA, en ningún texto del proyecto. Ver la [guía de redacción](05-guia-de-redaccion.md); una prueba automática la hace cumplir.

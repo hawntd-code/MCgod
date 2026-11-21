@@ -2,7 +2,7 @@
 
 Programa para crear mods de Minecraft, con un asistente de IA dentro. Es una variante de [MCreator](https://mcreator.net/) reescrita en Rust: interfaz nueva, un panel de chat donde conectas tu propio proveedor de IA y un servidor MCP para que otros agentes trabajen sobre tu mod.
 
-> **Estado:** fase 1 en curso. La app abre proyectos de MCreator y muestra sus elementos agrupados por tipo, con el detalle de cada uno, en español e inglés. Todavía no edita, compila ni crea mods. Ver la [hoja de ruta](docs/03-hoja-de-ruta.md).
+> **Estado:** fase 1 en curso. La app abre proyectos de MCreator, muestra sus elementos agrupados por tipo y los compila o abre Minecraft con el mod, con la salida de Gradle en vivo. Todavía no edita elementos ni genera código. Ver la [hoja de ruta](docs/03-hoja-de-ruta.md).
 
 ## Objetivos
 
@@ -30,6 +30,12 @@ Requisitos: [Rust](https://rustup.rs/) estable, [Node.js](https://nodejs.org/) L
 powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
 ```
 
+Para probar compilar y jugar, abre en la app `examples/rubymod/rubymod.mcreator` y pulsa **Probar en Minecraft**. La primera vez Gradle descarga NeoForge y Minecraft (varios cientos de MB). Lo mismo, sin la interfaz:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\probar-gradle.ps1 runClient
+```
+
 Pruebas:
 
 ```powershell
@@ -48,7 +54,9 @@ git clone --depth 1 https://github.com/MCreator/MCreator.git reference/MCreator
 ```
 app/              Interfaz (React + TypeScript + Tailwind)
 app/src-tauri/    Puente entre interfaz y motor, ajustes de la app (Rust + Tauri 2)
-crates/           Piezas del motor en Rust (hoy: mcgod-workspace, lector de proyectos de MCreator)
+crates/           Piezas del motor en Rust: mcgod-workspace (lee proyectos de MCreator)
+                  y mcgod-gradle (compila y abre Minecraft)
+examples/rubymod/ Proyecto de ejemplo que compila y abre Minecraft
 docs/             Documentación del proyecto
 scripts/          Utilidades de desarrollo
 reference/        Código de MCreator para consulta (no se versiona)

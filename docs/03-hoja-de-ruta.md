@@ -20,11 +20,12 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 - [x] `mcgod-workspace`: leer workspaces de MCreator (`.mcreator` y `elements/*.mod.json`) sin perder campos
 - [x] Bienvenida solo en el primer arranque; después, pantalla de proyectos con recientes
 - [x] Abrir un proyecto: árbol de elementos por tipo, resumen del mod y vista de cada elemento
+- [x] `mcgod-gradle`: compilar el mod y abrir Minecraft desde la app, con la consola en vivo y botón para detener
+- [x] Proyecto de ejemplo `examples/rubymod` que compila y abre Minecraft con el mod cargado
 - [ ] `mcgod-workspace`: guardar cambios con el mismo formato
 - [ ] `mcgod-ftl`: intérprete FreeMarker con lo que usan las plantillas reales
-- [ ] `mcgod-generator`: generar el tipo **Item** para NeoForge 26.3
+- [ ] `mcgod-generator`: generar el tipo **Item** para NeoForge 1.21.1 (el generador LTS de MCreator)
 - [ ] Pruebas golden contra MCreator real
-- [ ] `mcgod-gradle`: compilar el mod y abrir Minecraft, con la consola en vivo
 
 **Resultado:** un ítem creado a mano en un workspace se compila y aparece en el juego.
 

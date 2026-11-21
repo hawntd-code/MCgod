@@ -1933,6 +1933,7 @@ name = "mcgod"
 version = "0.1.0"
 dependencies = [
  "log",
+ "mcgod-gradle",
  "mcgod-workspace",
  "serde",
  "serde_json",
@@ -1941,6 +1942,16 @@ dependencies = [
  "tauri-plugin-dialog",
  "tauri-plugin-log",
  "tempfile",
+]
+
+[[package]]
+name = "mcgod-gradle"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
 ]
 
 [[package]]

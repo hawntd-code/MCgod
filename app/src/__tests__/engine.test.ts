@@ -7,7 +7,7 @@ vi.mock("@tauri-apps/api/core", () => ({ isTauri: vi.fn(), invoke: vi.fn() }));
 const env: Environment = {
   appVersion: "0.1.0",
   os: "Windows x86_64",
-  java: { version: "21.0.13.1", major: 21, vendor: "Temurin" },
+  java: { version: "21.0.13.1", major: 21, vendor: "Temurin", home: null },
 };
 
 describe("readEnvironment", () => {

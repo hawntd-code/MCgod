@@ -11,7 +11,15 @@ export function javaStatus(engine: EngineState, s: Messages["status"]): { text: 
   return { text: s.java(java.version), warn: !ok };
 }
 
-export function StatusBar({ engine, workspace }: { engine: EngineState; workspace: WorkspaceSummary | null }) {
+export function StatusBar({
+  engine,
+  workspace,
+  gradleRunning = false,
+}: {
+  engine: EngineState;
+  workspace: WorkspaceSummary | null;
+  gradleRunning?: boolean;
+}) {
   const { m, lang, setLang } = useI18n();
   const java = javaStatus(engine, m.status);
   const version = engine.status === "ready" ? `v${engine.env.appVersion}` : "";
@@ -22,6 +30,7 @@ export function StatusBar({ engine, workspace }: { engine: EngineState; workspac
       <span data-testid="status-project">{workspace ? workspace.modid : m.status.noProject}</span>
       <span data-testid="status-generator">{generator ?? m.status.noGenerator}</span>
       {workspace && <span className="tabular-nums">{m.status.elements(workspace.elements.length)}</span>}
+      {gradleRunning && <span className="text-brand-bright">{m.status.gradleRunning}</span>}
       <span className="ml-auto">{m.status.mcpOff}</span>
       <span className={java.warn ? "text-warn" : undefined} data-testid="java-status">
         {java.text}

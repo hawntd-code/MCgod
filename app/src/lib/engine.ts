@@ -1,11 +1,19 @@
-import { invoke, isTauri } from "@tauri-apps/api/core";
-import { demoDefinitions, DEMO_FILE, demoSummary } from "./demo";
+import { Channel, invoke, isTauri } from "@tauri-apps/api/core";
+import { demoDefinitions, DEMO_FILE, demoGradleOutput, demoSummary } from "./demo";
 
 export type JavaInfo = {
   version: string;
   major: number | null;
   vendor: string | null;
+  home: string | null;
 };
+
+export type GradleTask = "build" | "runClient";
+export type OutputLine = { stream: "stdout" | "stderr"; text: string };
+export type GradleOutcome = "success" | "failed" | "cancelled";
+export type GradleEvent =
+  | { kind: "lines"; lines: OutputLine[] }
+  | { kind: "finished"; outcome: GradleOutcome; exitCode: number | null; durationMs: number };
 
 export type Environment = {
   appVersion: string;
@@ -49,6 +57,7 @@ export type WorkspaceSummary = {
   sounds: number;
   tags: number;
   languages: string[];
+  hasGradle: boolean;
 };
 
 export type ElementDefinition = {
@@ -92,6 +101,9 @@ export interface Backend {
   closeWorkspace(): Promise<void>;
   readElement(name: string): Promise<ElementDefinition>;
   forgetRecent(path: string): Promise<AppSettings>;
+  /** Lanza Gradle. Responde al arrancar; la salida y el final llegan por `onEvent`. */
+  runGradle(task: GradleTask, onEvent: (event: GradleEvent) => void): Promise<void>;
+  stopGradle(): Promise<void>;
 }
 
 const tauriBackend: Backend = {
@@ -106,6 +118,12 @@ const tauriBackend: Backend = {
   closeWorkspace: () => invoke<void>("close_workspace"),
   readElement: (name) => invoke<ElementDefinition>("read_element", { name }),
   forgetRecent: (path) => invoke<AppSettings>("forget_recent", { path }),
+  runGradle: async (task, onEvent) => {
+    const channel = new Channel<GradleEvent>();
+    channel.onmessage = onEvent;
+    await invoke<void>("gradle_run", { task, onEvent: channel });
+  },
+  stopGradle: () => invoke<void>("gradle_stop"),
 };
 
 /**
@@ -135,6 +153,8 @@ export function createBrowserBackend(demo: boolean): Backend {
     return next;
   };
   const desktopOnly = (): EngineError => ({ code: "desktopOnly", detail: "" });
+  let gradleTimer: ReturnType<typeof setTimeout> | null = null;
+  let gradleFinish: (() => void) | null = null;
 
   return {
     settings: async () => (memory = read()),
@@ -162,6 +182,37 @@ export function createBrowserBackend(demo: boolean): Backend {
       return structuredClone(def);
     },
     forgetRecent: async (path) => write({ ...memory, recent: memory.recent.filter((r) => r.path !== path) }),
+    // Simulación para la vista del navegador: repite una salida real de Gradle, más rápido.
+    runGradle: async (task, onEvent) => {
+      if (!demo) throw desktopOnly();
+      if (gradleTimer) throw { code: "gradleBusy", detail: task } satisfies EngineError;
+      const lines = demoGradleOutput(task);
+      const started = Date.now();
+      let i = 0;
+      const step = () => {
+        const chunk = lines.slice(i, i + 6);
+        i += chunk.length;
+        if (chunk.length) onEvent({ kind: "lines", lines: chunk.map((text) => ({ stream: "stdout", text })) });
+        if (i < lines.length) {
+          gradleTimer = setTimeout(step, 120);
+        } else if (task === "runClient") {
+          // Como el juego real: sigue abierto hasta que se detiene.
+          gradleTimer = setTimeout(() => {}, 2_147_483_647);
+        } else {
+          gradleTimer = null;
+          gradleFinish = null;
+          onEvent({ kind: "finished", outcome: "success", exitCode: 0, durationMs: Date.now() - started });
+        }
+      };
+      gradleFinish = () => onEvent({ kind: "finished", outcome: "cancelled", exitCode: null, durationMs: Date.now() - started });
+      gradleTimer = setTimeout(step, 50);
+    },
+    stopGradle: async () => {
+      if (gradleTimer) clearTimeout(gradleTimer);
+      gradleTimer = null;
+      gradleFinish?.();
+      gradleFinish = null;
+    },
   };
 }
 

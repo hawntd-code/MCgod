@@ -74,6 +74,8 @@ pub struct WorkspaceSummary {
     pub sounds: usize,
     pub tags: usize,
     pub languages: Vec<String>,
+    /// Tiene `build.gradle` y `gradlew`: se puede compilar y abrir Minecraft.
+    pub has_gradle: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -169,7 +171,16 @@ impl Workspace {
             sounds: self.data.sound_elements.len(),
             tags: self.data.tag_elements.len(),
             languages: self.data.language_map.keys().cloned().collect(),
+            has_gradle: self.has_gradle(),
         }
+    }
+
+    pub fn has_gradle(&self) -> bool {
+        let build = self.root.join("build.gradle").is_file()
+            || self.root.join("build.gradle.kts").is_file();
+        let wrapper =
+            self.root.join("gradlew.bat").is_file() || self.root.join("gradlew").is_file();
+        build && wrapper
     }
 }
 
