@@ -30,7 +30,12 @@ export function StatusBar({
       <span data-testid="status-project">{workspace ? workspace.modid : m.status.noProject}</span>
       <span data-testid="status-generator">{generator ?? m.status.noGenerator}</span>
       {workspace && <span className="tabular-nums">{m.status.elements(workspace.elements.length)}</span>}
-      {gradleRunning && <span className="text-brand-bright">{m.status.gradleRunning}</span>}
+      {gradleRunning && (
+        <span className="flex animate-fade items-center gap-2 text-brand-bright">
+          <span className="signal w-6" aria-hidden />
+          {m.status.gradleRunning}
+        </span>
+      )}
       <span className="ml-auto">{m.status.mcpOff}</span>
       <span className={java.warn ? "text-warn" : undefined} data-testid="java-status">
         {java.text}

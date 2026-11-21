@@ -2,6 +2,7 @@ import { CircleAlert, LogOut } from "lucide-react";
 import { useI18n } from "../i18n";
 import type { WorkspaceSummary } from "../lib/engine";
 import { generatorLabel, groupByType, needsReview } from "../lib/format";
+import { delay, stagger } from "../lib/motion";
 
 type Props = {
   workspace: WorkspaceSummary;
@@ -32,7 +33,7 @@ export function WorkspaceOverview({ workspace, onOpenElement, onClose }: Props) 
 
   return (
     <div className="mx-auto max-w-[1080px] px-[clamp(1.5rem,4vw,3rem)] py-10">
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
+      <div className="flex animate-enter flex-wrap items-start justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
           <h1 className="font-display text-[2.75rem] font-[800] leading-[0.95] tracking-[-0.028em] [font-stretch:118%]">
             {workspace.name}
@@ -42,7 +43,7 @@ export function WorkspaceOverview({ workspace, onOpenElement, onClose }: Props) 
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex h-8 items-center gap-2 rounded-ui border border-line px-3 text-small text-ink-muted transition-colors duration-150 hover:bg-hover hover:text-ink"
+          className="inline-flex h-8 items-center gap-2 rounded-ui border border-line px-3 text-small text-ink-muted transition-[color,background-color,transform] duration-150 hover:bg-hover hover:text-ink active:translate-y-px"
         >
           <LogOut className="size-3.5" aria-hidden />
           {w.close}
@@ -50,18 +51,18 @@ export function WorkspaceOverview({ workspace, onOpenElement, onClose }: Props) 
       </div>
 
       <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 border-y border-line py-5 lg:grid-cols-4">
-        {facts.map((f) => (
-          <div key={f.label} className="min-w-0">
+        {facts.map((f, i) => (
+          <div key={f.label} className="min-w-0 animate-enter" style={stagger(i, { base: 60, step: 35 })}>
             <dt className="text-label text-ink-faint">{f.label}</dt>
             <dd className={`mt-1 truncate font-semibold text-ink ${f.mono ? "font-mono text-small" : ""}`}>{f.value}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-2 truncate font-mono text-label text-ink-faint" title={workspace.file}>
+      <p className="mt-2 animate-fade truncate font-mono text-label text-ink-faint" style={delay(160)} title={workspace.file}>
         {workspace.file}
       </p>
 
-      <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
+      <dl className="mt-6 flex animate-enter flex-wrap gap-x-8 gap-y-3" style={delay(180)}>
         {counts.map((c) => (
           <div key={c.label} className="flex items-baseline gap-2">
             <dt className="text-small text-ink-muted">{c.label}</dt>
@@ -70,19 +71,23 @@ export function WorkspaceOverview({ workspace, onOpenElement, onClose }: Props) 
         ))}
       </dl>
 
-      <div className="mt-10 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+      <div
+        className="mt-10 grid animate-enter gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]"
+        style={delay(220)}
+      >
         <section aria-labelledby="by-type">
           <h2 id="by-type" className="font-display text-h3 font-[680] [font-stretch:110%]">
             {w.byType}
           </h2>
           <ul className="mt-3 space-y-2">
-            {groups.map((g) => (
+            {groups.map((g, i) => (
               <li key={g.type} className="grid grid-cols-[minmax(0,11rem)_1fr_2rem] items-center gap-3 text-small">
                 <span className="truncate text-ink">{g.label}</span>
                 <span className="h-2 rounded-[2px] bg-raised" aria-hidden>
+                  {/* Las barras crecen desde la izquierda al abrir el proyecto, en orden de tamaño */}
                   <span
-                    className="block h-full rounded-[2px] bg-brand"
-                    style={{ width: `${(g.elements.length / max) * 100}%` }}
+                    className="block h-full origin-left animate-bar rounded-[2px] bg-brand"
+                    style={{ width: `${(g.elements.length / max) * 100}%`, ...stagger(i, { base: 260, step: 45 }) }}
                   />
                 </span>
                 <span className="text-right tabular-nums text-ink-muted">{g.elements.length}</span>

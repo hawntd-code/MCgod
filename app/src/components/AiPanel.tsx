@@ -46,10 +46,10 @@ export function AiPanel() {
                   className="flex w-full items-center gap-3 px-1 py-2.5 text-left transition-colors duration-150 hover:bg-hover aria-checked:bg-raised"
                 >
                   <span
-                    className={`grid size-4 shrink-0 place-items-center rounded-full border ${on ? "border-brand bg-brand text-brand-ink" : "border-line-strong"}`}
+                    className={`grid size-4 shrink-0 place-items-center rounded-full border transition-colors duration-150 ${on ? "border-brand bg-brand text-brand-ink" : "border-line-strong"}`}
                     aria-hidden
                   >
-                    {on && <Check className="size-3" strokeWidth={3} />}
+                    {on && <Check className="size-3 animate-pop" strokeWidth={3} />}
                   </span>
                   <span className="min-w-0">
                     <span className="block text-body font-medium leading-tight text-ink">{name}</span>
@@ -61,8 +61,9 @@ export function AiPanel() {
           })}
         </ul>
 
+        {/* Los avisos y, más adelante, los mensajes del chat entran desde abajo */}
         {picked && (
-          <p className="mt-3 text-small text-ink-muted" role="status">
+          <p className="mt-3 animate-enter text-small text-ink-muted" role="status">
             {a.pickedNote}
           </p>
         )}

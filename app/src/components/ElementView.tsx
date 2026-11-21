@@ -4,6 +4,7 @@ import { useI18n } from "../i18n";
 import { useBackend } from "../lib/backend-context";
 import { toEngineError, type ElementDefinition, type ElementSummary, type EngineError } from "../lib/engine";
 import { formatField, needsReview, typeLabel } from "../lib/format";
+import { delay } from "../lib/motion";
 import { errorMessage } from "./ErrorNotice";
 
 type Load = { status: "loading" } | { status: "ready"; def: ElementDefinition } | { status: "error"; error: EngineError };
@@ -37,15 +38,17 @@ export function ElementView({ element }: { element: ElementSummary }) {
 
   return (
     <article className="mx-auto max-w-[1080px] px-[clamp(1.5rem,4vw,3rem)] py-10" aria-labelledby="element-title">
-      <p className="text-small font-medium text-brand-bright">{typeLabel(element.type, m)}</p>
-      <h1
-        id="element-title"
-        className="mt-1 font-display text-[2.25rem] font-[800] leading-none tracking-[-0.025em] [font-stretch:116%]"
-      >
-        {element.name}
-      </h1>
+      <div className="animate-enter">
+        <p className="text-small font-medium text-brand-bright">{typeLabel(element.type, m)}</p>
+        <h1
+          id="element-title"
+          className="mt-1 font-display text-[2.25rem] font-[800] leading-none tracking-[-0.025em] [font-stretch:116%]"
+        >
+          {element.name}
+        </h1>
+      </div>
 
-      <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-2 text-small">
+      <dl className="mt-5 flex animate-enter flex-wrap gap-x-8 gap-y-2 text-small" style={delay(40)}>
         <div className="flex gap-2">
           <dt className="text-ink-faint">{e.registryName}</dt>
           <dd className="font-mono text-ink">{element.registryName ?? "—"}</dd>
@@ -57,14 +60,14 @@ export function ElementView({ element }: { element: ElementSummary }) {
           </div>
         )}
         {load.status === "ready" && (
-          <div className="flex gap-2">
+          <div className="flex animate-fade gap-2">
             <dd className="text-ink-faint">{e.format(String(load.def._fv))}</dd>
           </div>
         )}
       </dl>
 
       {notes.length > 0 && (
-        <ul className="mt-4 space-y-1.5">
+        <ul className="mt-4 animate-enter space-y-1.5" style={delay(60)}>
           {notes.map((n) => (
             <li key={n.text} className={`flex items-center gap-2 text-small ${n.tone === "warn" ? "text-warn" : "text-ink-muted"}`}>
               <n.icon className="size-4 shrink-0" aria-hidden />
@@ -74,36 +77,42 @@ export function ElementView({ element }: { element: ElementSummary }) {
         </ul>
       )}
 
-      <div className="mt-8 flex items-center justify-between border-b border-line pb-2">
+      <div className="mt-8 flex animate-enter items-center justify-between border-b border-line pb-2" style={delay(80)}>
         <h2 className="font-display text-h3 font-[680] [font-stretch:110%]">{e.fields}</h2>
         {load.status === "ready" && (
           <button
             type="button"
             onClick={() => setRaw((v) => !v)}
             aria-pressed={raw}
-            className="h-7 rounded-ui px-2.5 text-small text-ink-muted transition-colors duration-150 hover:bg-hover hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+            className="h-7 animate-fade rounded-ui px-2.5 text-small text-ink-muted transition-colors duration-150 hover:bg-hover hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
           >
             {raw ? e.showFields : e.showRaw}
           </button>
         )}
       </div>
 
-      {load.status === "loading" && <p className="mt-4 text-small text-ink-muted">{e.loading}</p>}
+      {/* El aviso de carga espera un instante antes de verse: una lectura rápida no parpadea */}
+      {load.status === "loading" && (
+        <p className="mt-4 animate-fade text-small text-ink-muted" style={delay(150)}>
+          {e.loading}
+        </p>
+      )}
 
       {load.status === "error" && (
-        <p className="mt-4 text-small text-ink-muted" role="status">
+        <p className="mt-4 animate-fade text-small text-ink-muted" role="status">
           {element.type === "code" && load.error.code === "noDefinition" ? e.noDefinitionType : errorMessage(load.error, m)}
         </p>
       )}
 
       {load.status === "ready" &&
         (raw ? (
-          <pre className="mt-4 max-h-[60vh] overflow-auto rounded-ui border border-line bg-ground p-4 font-mono text-label leading-relaxed text-ink-muted select-text">
+          <pre className="mt-4 max-h-[60vh] animate-fade overflow-auto rounded-ui border border-line bg-ground p-4 font-mono text-label leading-relaxed text-ink-muted select-text">
             {JSON.stringify(load.def, null, 2)}
           </pre>
         ) : (
           <>
-            <table className="mt-2 w-full text-small">
+            {/* La tabla entra completa: con bordes colapsados, animar filas sueltas deja las líneas solas */}
+            <table className="mt-2 w-full animate-fade text-small" style={delay(60)}>
               <tbody className="divide-y divide-line">
                 {Object.entries(load.def.definition).map(([key, value]) => {
                   const f = formatField(value, e);

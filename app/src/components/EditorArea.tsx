@@ -21,9 +21,10 @@ export function EditorArea({ workspace, tabs, active, onActivate, onCloseTab, on
   const { m } = useI18n();
   const element = workspace.elements.find((e) => e.name === active);
 
+  // La línea de cobre de la pestaña activa se extiende desde el centro al cambiar de pestaña.
   const tabClass = (on: boolean) =>
-    `flex h-8 items-center gap-2 rounded-t-ui border border-b-0 px-3 text-small transition-colors duration-150 ${
-      on ? "border-line bg-surface text-ink shadow-[inset_0_2px_0_var(--color-brand)]" : "border-transparent text-ink-faint hover:text-ink"
+    `relative flex h-8 items-center gap-2 rounded-t-ui border border-b-0 px-3 text-small transition-colors duration-150 before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:rounded-t-[3px] before:bg-brand before:transition-transform before:duration-200 before:ease-out-expo ${
+      on ? "border-line bg-surface text-ink before:scale-x-100" : "border-transparent text-ink-faint hover:text-ink before:scale-x-0"
     }`;
 
   return (
@@ -40,7 +41,7 @@ export function EditorArea({ workspace, tabs, active, onActivate, onCloseTab, on
           {m.workspace.overview}
         </button>
         {tabs.map((name) => (
-          <div key={name} className={`${tabClass(active === name)} pr-1`}>
+          <div key={name} className={`${tabClass(active === name)} animate-tab pr-1`}>
             <button
               type="button"
               role="tab"

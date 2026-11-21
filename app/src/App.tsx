@@ -59,6 +59,20 @@ export function App({ backend: injected }: { backend?: Backend }) {
     ai: useRef<ImperativePanelHandle>(null),
   };
 
+  // Mientras dura un plegado pedido con botón o atajo, styles.css anima el tamaño de los paneles.
+  // Al arrastrar un borde no se marca, para que el panel siga al ratón sin retraso.
+  const shell = useRef<HTMLDivElement>(null);
+  const motionTimer = useRef<number | undefined>(undefined);
+  const withPanelMotion = useCallback((change: () => void) => {
+    const el = shell.current;
+    if (el) {
+      el.setAttribute("data-panel-motion", "");
+      window.clearTimeout(motionTimer.current);
+      motionTimer.current = window.setTimeout(() => el.removeAttribute("data-panel-motion"), 340);
+    }
+    change();
+  }, []);
+
   useEffect(() => {
     readEnvironment().then(setEngine);
     backend
@@ -102,11 +116,11 @@ export function App({ backend: injected }: { backend?: Backend }) {
     (task: GradleTask) => {
       // La salida se ve en la consola: si estaba oculta, se muestra.
       const panel = refs.console.current;
-      if (panel?.isCollapsed()) panel.expand();
+      if (panel?.isCollapsed()) withPanelMotion(() => panel.expand());
       void gradle.start(task);
     },
     // Los refs son estables entre renders, por eso no están en las dependencias.
-    [gradle.start],
+    [gradle.start, withPanelMotion],
   );
 
   const closeProject = useCallback(async () => {
@@ -159,10 +173,9 @@ export function App({ backend: injected }: { backend?: Backend }) {
   const toggle = useCallback((key: PanelKey) => {
     const panel = refs[key].current;
     if (!panel) return;
-    if (panel.isCollapsed()) panel.expand();
-    else panel.collapse();
-    // Los refs son estables entre renders, por eso no hay dependencias.
-  }, []);
+    withPanelMotion(() => (panel.isCollapsed() ? panel.expand() : panel.collapse()));
+    // Los refs son estables entre renders, por eso no están en las dependencias.
+  }, [withPanelMotion]);
 
   // Atajos al estilo de los IDE: Ctrl+B árbol, Ctrl+J consola, Ctrl+L asistente
   useEffect(() => {
@@ -184,11 +197,11 @@ export function App({ backend: injected }: { backend?: Backend }) {
   const chooseActivity = (next: Activity) => {
     const panel = refs.sidebar.current;
     if (next === activity && panel && !panel.isCollapsed()) {
-      panel.collapse();
+      withPanelMotion(() => panel.collapse());
       return;
     }
     setActivity(next);
-    if (panel?.isCollapsed()) panel.expand();
+    if (panel?.isCollapsed()) withPanelMotion(() => panel.expand());
   };
 
   // --- Vista ---------------------------------------------------------------------
@@ -205,7 +218,7 @@ export function App({ backend: injected }: { backend?: Backend }) {
 
   return (
     <BackendProvider backend={backend}>
-      <div className="flex h-full flex-col">
+      <div ref={shell} className="flex h-full animate-fade flex-col">
         <TopBar
           open={open}
           onToggle={toggle}

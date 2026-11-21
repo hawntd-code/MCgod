@@ -54,8 +54,31 @@ function RunStatus({ run }: { run: RunState }) {
   }
   return (
     <span role="status" className={`flex min-w-0 items-center gap-1.5 truncate text-small ${tone}`}>
-      {icon}
-      <span className="truncate">{text}</span>
+      <span key={run.status} className="grid shrink-0 animate-pop place-items-center">
+        {icon}
+      </span>
+      <span key={text} className="animate-fade truncate">
+        {text}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Señal de redstone en el borde inferior de la cabecera: recorre el cable mientras Gradle trabaja
+ * y lo llena al terminar (verde si salió bien, rojo si falló). Es decorativa: el texto de estado ya lo dice.
+ */
+function RunSignal({ run }: { run: RunState }) {
+  const tone = run.status !== "idle" && run.task === "runClient" ? "text-signal" : "text-brand";
+  let line = null;
+  if (isRunning(run)) line = <span className={`signal ${tone}`} />;
+  else if (run.status === "done" && run.outcome === "success") line = <span className="signal-done text-ok" />;
+  else if (run.status === "error" || (run.status === "done" && run.outcome === "failed"))
+    line = <span className="signal-done text-error" />;
+  if (!line) return null;
+  return (
+    <span className="pointer-events-none absolute inset-x-0 -bottom-px" aria-hidden data-testid="run-signal">
+      {line}
     </span>
   );
 }
@@ -93,7 +116,8 @@ export function ConsolePanel({ run, lines, dropped, onStop, onClear }: Props) {
 
   return (
     <section className="flex h-full flex-col bg-ground">
-      <div className="flex h-9 shrink-0 items-center gap-3 border-b border-line px-2">
+      <div className="relative flex h-9 shrink-0 items-center gap-3 border-b border-line px-2">
+        <RunSignal run={run} />
         <div role="tablist" className="flex shrink-0 items-center gap-1">
           {tabs.map((t) => (
             <button
@@ -120,7 +144,7 @@ export function ConsolePanel({ run, lines, dropped, onStop, onClear }: Props) {
               <button
                 type="button"
                 onClick={onStop}
-                className="flex h-7 shrink-0 items-center gap-1.5 rounded-ui px-2.5 text-small text-ink-muted transition-colors duration-150 hover:bg-hover hover:text-ink"
+                className="flex h-7 shrink-0 animate-pop items-center gap-1.5 rounded-ui px-2.5 text-small text-ink-muted transition-[color,background-color,transform] duration-150 hover:bg-hover hover:text-ink active:translate-y-px"
               >
                 <Square className="size-3 fill-current" aria-hidden />
                 {m.topBar.stop}
@@ -149,14 +173,16 @@ export function ConsolePanel({ run, lines, dropped, onStop, onClear }: Props) {
         className="min-h-0 flex-1 overflow-auto px-4 py-2 font-mono text-[0.78rem] leading-[1.5] select-text"
       >
         {tab === "ai" ? (
-          <p className="py-1 text-ink-faint">{m.console.aiEmpty}</p>
+          <p key="ai" className="animate-fade py-1 text-ink-faint">
+            {m.console.aiEmpty}
+          </p>
         ) : lines.length === 0 ? (
-          <div className="py-1 text-ink-faint">
+          <div key="empty" className="animate-fade py-1 text-ink-faint">
             <p>{m.console.gradleEmpty}</p>
-            {running && <p className="mt-1">{m.console.firstRun}</p>}
+            {running && <p className="mt-1 animate-fade">{m.console.firstRun}</p>}
           </div>
         ) : (
-          <div data-testid="gradle-output">
+          <div key="output" data-testid="gradle-output" className="animate-fade">
             {dropped > 0 && <p className="pb-1 text-ink-faint">{m.console.hidden(dropped)}</p>}
             {lines.map((line, i) => (
               <div key={i} className={`whitespace-pre-wrap break-all ${toneClass[toneOf(line.text)]}`}>

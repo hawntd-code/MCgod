@@ -12,7 +12,7 @@ export function errorMessage(error: EngineError, m: ReturnType<typeof useI18n>["
 export function ErrorNotice({ error, onDismiss }: { error: EngineError; onDismiss?: () => void }) {
   const { m } = useI18n();
   return (
-    <div role="alert" className="flex items-start gap-3 rounded-ui border border-error/50 bg-error/10 px-4 py-3">
+    <div role="alert" className="flex animate-enter items-start gap-3 rounded-ui border border-error/50 bg-error/10 px-4 py-3">
       <CircleAlert className="mt-0.5 size-4 shrink-0 text-error" aria-hidden />
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-ink">{m.errors.title}</p>

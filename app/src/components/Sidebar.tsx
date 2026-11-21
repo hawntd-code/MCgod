@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useI18n } from "../i18n";
 import type { WorkspaceSummary } from "../lib/engine";
 import { groupByType, matchesFilter, needsReview } from "../lib/format";
+import { stagger } from "../lib/motion";
 import type { Activity } from "./ActivityRail";
 
 type Props = {
@@ -58,7 +59,9 @@ export function Sidebar({ activity, workspace, activeElement, onOpenElement }: P
 
       {showTree ? (
         <nav aria-label={c.title} className="min-h-0 flex-1 overflow-auto pb-4">
-          {groups.length === 0 && <p className="px-4 py-3 text-small text-ink-muted">{m.sidebar.noMatches}</p>}
+          {groups.length === 0 && (
+            <p className="animate-fade px-4 py-3 text-small text-ink-muted">{m.sidebar.noMatches}</p>
+          )}
           {groups.map((g) => {
             const open = !collapsed.has(g.type) || filter.trim() !== "";
             return (
@@ -70,7 +73,7 @@ export function Sidebar({ activity, workspace, activeElement, onOpenElement }: P
                   className="flex w-full items-center gap-1.5 px-3 py-1 text-label font-semibold uppercase tracking-[0.04em] text-ink-faint transition-colors duration-150 hover:text-ink"
                 >
                   <ChevronRight
-                    className={`size-3.5 shrink-0 transition-transform duration-150 ${open ? "rotate-90" : ""}`}
+                    className={`size-3.5 shrink-0 transition-transform duration-200 ease-out-expo ${open ? "rotate-90" : ""}`}
                     aria-hidden
                   />
                   <span className="truncate">{g.label}</span>
@@ -78,13 +81,13 @@ export function Sidebar({ activity, workspace, activeElement, onOpenElement }: P
                 </button>
                 {open && (
                   <ul>
-                    {g.elements.map((e) => {
+                    {g.elements.map((e, i) => {
                       const current = e.name === activeElement;
                       const label = [e.name, e.lockedCode && m.sidebar.locked, needsReview(e) && m.sidebar.needsReview]
                         .filter(Boolean)
                         .join(", ");
                       return (
-                        <li key={e.name}>
+                        <li key={e.name} className="animate-row" style={stagger(i, { step: 22 })}>
                           <button
                             type="button"
                             onClick={() => onOpenElement(e.name)}
@@ -114,7 +117,7 @@ export function Sidebar({ activity, workspace, activeElement, onOpenElement }: P
           })}
         </nav>
       ) : (
-        <div className="flex flex-1 flex-col justify-center px-6 pb-16">
+        <div key={activity} className="flex flex-1 animate-fade flex-col justify-center px-6 pb-16">
           <h3 className="text-h3 font-semibold text-ink">{c.emptyTitle}</h3>
           <p className="mt-2 text-small text-ink-muted">{c.emptyText}</p>
           <p className="mt-4 text-label text-ink-faint">{c.phase}</p>

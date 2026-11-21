@@ -26,7 +26,11 @@ export function TopBar({ open, onToggle, projectName, canRun, runningTask, onRun
   const t = m.topBar;
 
   const reason = !projectName ? t.needProject : !canRun ? t.noGradle : runningTask ? t.busy : null;
-  const busyIcon = <LoaderCircle className="size-3.5 animate-spin" aria-hidden />;
+  const busyIcon = (
+    <span className="grid animate-pop place-items-center" aria-hidden>
+      <LoaderCircle className="size-3.5 animate-spin" />
+    </span>
+  );
 
   return (
     <header className="flex h-11 shrink-0 items-center gap-3 border-b border-line bg-ground px-3">
@@ -36,8 +40,9 @@ export function TopBar({ open, onToggle, projectName, canRun, runningTask, onRun
       </div>
 
       <span
+        key={projectName ?? ""}
         data-testid="project-name"
-        className={`flex h-7 max-w-[28ch] items-center truncate rounded-ui border border-line px-2.5 text-small ${projectName ? "font-medium text-ink" : "text-ink-muted"}`}
+        className={`flex h-7 max-w-[28ch] animate-enter items-center truncate rounded-ui border border-line px-2.5 text-small ${projectName ? "font-medium text-ink" : "text-ink-muted"}`}
       >
         {projectName ?? t.noProject}
       </span>
@@ -48,31 +53,37 @@ export function TopBar({ open, onToggle, projectName, canRun, runningTask, onRun
           disabled={reason !== null}
           onClick={() => onRun("build")}
           title={reason ?? t.buildHint}
-          className="flex h-7 items-center gap-1.5 rounded-ui px-2.5 text-small font-medium text-ink-muted transition-colors duration-150 hover:bg-hover hover:text-ink disabled:cursor-not-allowed disabled:text-ink-faint disabled:hover:bg-transparent"
+          className="flex h-7 items-center gap-1.5 rounded-ui px-2.5 text-small font-medium text-ink-muted transition-[color,background-color,transform] duration-150 hover:bg-hover hover:text-ink active:translate-y-px disabled:cursor-not-allowed disabled:text-ink-faint disabled:hover:bg-transparent disabled:active:translate-y-0"
         >
           {runningTask === "build" ? busyIcon : <Hammer className="size-3.5" aria-hidden />}
           {runningTask === "build" ? t.building : t.build}
         </button>
 
+        {/* Jugar y Detener ocupan el mismo lugar: al cambiar, el nuevo botón asienta en su sitio */}
         {runningTask ? (
           <button
+            key="stop"
             type="button"
             onClick={onStop}
             title={t.stopHint}
-            className="flex h-7 items-center gap-1.5 rounded-ui border border-signal px-3 text-small font-semibold text-ink transition-colors duration-150 hover:bg-signal/20"
+            className="flex h-7 animate-pop items-center gap-1.5 rounded-ui border border-signal px-3 text-small font-semibold text-ink transition-[background-color,transform] duration-150 hover:bg-signal/20 active:translate-y-px"
           >
             {runningTask === "runClient" ? busyIcon : <Square className="size-3 fill-current" aria-hidden />}
             {runningTask === "runClient" ? `${t.launching} · ${t.stop}` : t.stop}
           </button>
         ) : (
           <button
+            key="play"
             type="button"
             disabled={reason !== null}
             onClick={() => onRun("runClient")}
             title={reason ?? t.playHint}
-            className="flex h-7 items-center gap-1.5 rounded-ui bg-signal px-3 text-small font-semibold text-signal-ink transition-[filter,opacity] duration-150 hover:brightness-110 active:brightness-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:brightness-100"
+            className="group flex h-7 animate-pop items-center gap-1.5 rounded-ui bg-signal px-3 text-small font-semibold text-signal-ink transition-[filter,opacity,transform] duration-150 hover:brightness-110 active:translate-y-px active:brightness-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:brightness-100 disabled:active:translate-y-0"
           >
-            <Play className="size-3.5 fill-current" aria-hidden />
+            <Play
+              className="size-3.5 fill-current transition-transform duration-200 ease-out-expo group-enabled:group-hover:translate-x-px"
+              aria-hidden
+            />
             {t.play}
           </button>
         )}

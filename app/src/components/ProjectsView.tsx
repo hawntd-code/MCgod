@@ -1,6 +1,7 @@
-import { FolderOpen, Plus, X } from "lucide-react";
+import { FolderOpen, LoaderCircle, Plus, X } from "lucide-react";
 import { useI18n } from "../i18n";
 import type { AppSettings, EngineError } from "../lib/engine";
+import { delay, stagger } from "../lib/motion";
 import { ErrorNotice } from "./ErrorNotice";
 
 type Props = {
@@ -24,19 +25,23 @@ export function ProjectsView({ settings, busy, error, onPick, onOpen, onForget, 
       <div className="mx-auto max-w-[880px] px-[clamp(1.5rem,4vw,3rem)] py-12">
         <h1
           id="projects-title"
-          className="font-display text-[2.5rem] font-[800] leading-none tracking-[-0.025em] [font-stretch:118%]"
+          className="animate-enter font-display text-[2.5rem] font-[800] leading-none tracking-[-0.025em] [font-stretch:118%]"
         >
           {p.title}
         </h1>
 
-        <div className="mt-7 flex flex-wrap items-center gap-3">
+        <div className="mt-7 flex animate-enter flex-wrap items-center gap-3" style={delay(50)}>
           <button
             type="button"
             onClick={onPick}
             disabled={busy}
-            className="inline-flex h-10 items-center gap-2 rounded-ui bg-brand px-4 font-semibold text-brand-ink transition-[filter] duration-150 hover:brightness-110 active:brightness-95 disabled:cursor-wait disabled:opacity-70"
+            className="inline-flex h-10 items-center gap-2 rounded-ui bg-brand px-4 font-semibold text-brand-ink transition-[filter,transform,opacity] duration-150 hover:brightness-110 active:translate-y-px active:brightness-95 disabled:cursor-wait disabled:opacity-70"
           >
-            <FolderOpen className="size-4" strokeWidth={2.25} aria-hidden />
+            {busy ? (
+              <LoaderCircle className="size-4 animate-spin" strokeWidth={2.25} aria-hidden />
+            ) : (
+              <FolderOpen className="size-4" strokeWidth={2.25} aria-hidden />
+            )}
             {busy ? p.opening : p.open}
           </button>
           <button
@@ -49,7 +54,9 @@ export function ProjectsView({ settings, busy, error, onPick, onOpen, onForget, 
             {p.newProject}
           </button>
         </div>
-        <p className="mt-3 text-small text-ink-muted">{p.openHint}</p>
+        <p className="mt-3 animate-enter text-small text-ink-muted" style={delay(80)}>
+          {p.openHint}
+        </p>
 
         {error && (
           <div className="mt-6">
@@ -57,13 +64,17 @@ export function ProjectsView({ settings, busy, error, onPick, onOpen, onForget, 
           </div>
         )}
 
-        <h2 className="mt-14 font-display text-h3 font-[680] [font-stretch:110%]">{p.recent}</h2>
+        <h2 className="mt-14 animate-enter font-display text-h3 font-[680] [font-stretch:110%]" style={delay(120)}>
+          {p.recent}
+        </h2>
         {settings.recent.length === 0 ? (
-          <p className="mt-3 text-small text-ink-muted">{p.recentEmpty}</p>
+          <p className="mt-3 animate-enter text-small text-ink-muted" style={delay(150)}>
+            {p.recentEmpty}
+          </p>
         ) : (
           <ul className="mt-3 divide-y divide-line border-y border-line" aria-label={p.recent}>
-            {settings.recent.map((r) => (
-              <li key={r.path} className="group flex items-center">
+            {settings.recent.map((r, i) => (
+              <li key={r.path} className="group flex animate-enter items-center" style={stagger(i, { base: 150, step: 40 })}>
                 <button
                   type="button"
                   onClick={() => onOpen(r.path)}
