@@ -107,9 +107,9 @@ export function App() {
           </Panel>
           <ResizeHandle />
 
-          <Panel id="center" order={2} minSize={34}>
+          <Panel id="center" order={2} defaultSize={56} minSize={34}>
             <PanelGroup direction="vertical" autoSaveId="mcgod:layout:v">
-              <Panel id="editor" order={1} minSize={35}>
+              <Panel id="editor" order={1} defaultSize={82} minSize={35}>
                 <Welcome engine={engine} />
               </Panel>
               <ResizeHandle vertical />

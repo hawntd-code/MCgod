@@ -65,7 +65,7 @@ flowchart LR
 | `mcgod-generator` | Rust | Cargar `generator.yaml` y `*.definition.yaml`, ejecutar plantillas, ordenar imports |
 | `mcgod-blockly` | Rust | Convertir el XML de Blockly de un procedure en código, usando las plantillas de cada bloque |
 | `mcgod-gradle` | Rust | Ejecutar `gradlew` (compilar, `runClient`, exportar) y transmitir la consola en vivo |
-| `mcgod-ai` | Rust | Conectores a proveedores (Anthropic, OpenAI y compatibles, Gemini, Ollama local) y el ciclo del agente |
+| `mcgod-ai` | Rust | Conectores a proveedores (Anthropic, OpenAI y compatibles, Gemini, DeepSeek, Ollama local) y el ciclo del agente |
 | `mcgod-kb` | Rust | Índice y búsqueda sobre la ayuda de MCreator + documentación propia de modding |
 | `mcgod-mcp` | Rust | Servidor MCP que expone las mismas herramientas que usa el chat integrado |
 
@@ -83,6 +83,7 @@ El diseño de las herramientas parte de las 25 que ya tiene el MCP de MCreator (
 ## Interfaz
 
 - **Tauri 2** + **React** + **TypeScript** + **Tailwind**.
+- **Español e inglés**: todo texto visible vive en `app/src/i18n/locales/`. TypeScript y una prueba exigen que los dos idiomas tengan las mismas claves.
 - **Blockly** y su JavaScript de MCreator funcionan tal cual dentro del WebView.
 - **Visores 3D** con three.js (modelos OBJ, Java y Blockbench).
 - **Editor de código** con Monaco (el de VS Code).

@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: app/package-lock.json
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
 
       - uses: Swatinem/rust-cache@v2
 
@@ -26,9 +28,19 @@ jobs:
         run: npm ci
         working-directory: app
 
+      - name: Pruebas de la interfaz y de redacción
+        run: npm test
+        working-directory: app
+
       - name: Revisar tipos y compilar la interfaz
         run: npm run build
         working-directory: app
+
+      - name: Formato del motor
+        run: cargo fmt --all -- --check
+
+      - name: Clippy sin advertencias
+        run: cargo clippy --workspace --all-targets -- -D warnings
 
       - name: Pruebas del motor
         run: cargo test --workspace

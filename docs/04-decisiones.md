@@ -29,3 +29,15 @@ Interfaz rediseñada, no una copia de la de MCreator. Cada opción muestra qué 
 ## 2026-11-20 · Panel de IA integrado y MCP
 
 Panel de chat a la derecha donde cada persona conecta su proveedor de IA por API key y ve a la IA trabajar en vivo. Las mismas herramientas se exponen por MCP para clientes externos.
+
+## 2026-11-21 · Interfaz en español e inglés
+
+Los dos idiomas desde el inicio. El idioma se elige en la barra de estado y se recuerda; la primera vez se toma del sistema.
+
+## 2026-11-21 · DeepSeek entre los proveedores
+
+Se suma a Anthropic, OpenAI, Gemini, Ollama y la opción compatible con OpenAI. Su API sigue el formato de OpenAI.
+
+## 2026-11-21 · Regla de redacción sin frases genéricas
+
+Nada de muletillas, clichés de marketing ni fórmulas típicas de texto generado por IA, en ningún texto del proyecto. Ver la [guía de redacción](05-guia-de-redaccion.md); una prueba automática la hace cumplir.

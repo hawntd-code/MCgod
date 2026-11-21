@@ -1,15 +1,15 @@
 # MCgod
 
-Estudio de mods de Minecraft con IA integrada. Es una variante de [MCreator](https://mcreator.net/) reescrita en Rust, con una interfaz nueva, un panel de chat donde conectas tu propio proveedor de IA y un servidor MCP para que cualquier agente pueda trabajar sobre tu mod.
+Programa para crear mods de Minecraft, con un asistente de IA dentro. Es una variante de [MCreator](https://mcreator.net/) reescrita en Rust: interfaz nueva, un panel de chat donde conectas tu propio proveedor de IA y un servidor MCP para que otros agentes trabajen sobre tu mod.
 
-> **Estado:** fase 0 (cimientos). La app abre con su diseño base y el motor en Rust ya responde; todavía no crea ni compila mods. Ver la [hoja de ruta](docs/03-hoja-de-ruta.md).
+> **Estado:** fase 0 (cimientos). La app abre con su diseño base, en español e inglés, y el motor en Rust ya responde; todavía no crea ni compila mods. Ver la [hoja de ruta](docs/03-hoja-de-ruta.md).
 
-## Qué busca el proyecto
+## Objetivos
 
 - **Paridad con MCreator:** los 37 tipos de elemento, los procedures con bloques y todos sus generadores (NeoForge, Data Pack, Resource Pack y Add-Ons de Bedrock).
-- **Más ligero y fluido:** motor en Rust e interfaz web en WebView2, en lugar de Java + Swing.
-- **IA de primera clase:** chat lateral al estilo VS Code o JetBrains, con tu propia clave de API, y la posibilidad de ver a la IA construir el mod en vivo.
-- **MCP:** las mismas herramientas del chat, expuestas para Claude Code, Codex, Cursor y otros clientes.
+- **Menos memoria:** motor en Rust e interfaz en WebView2, en lugar de Java con Swing y un Chromium embebido.
+- **Asistente de IA en la app:** panel lateral como el de VS Code o JetBrains. Conectas Anthropic, OpenAI, Gemini, DeepSeek, Ollama o cualquier servicio compatible con OpenAI usando tu propia clave, y ves cada cambio que hace la IA mientras lo hace.
+- **MCP:** las mismas herramientas del chat, disponibles para Claude Code, Codex, Cursor y otros clientes.
 - **Ayuda en cada opción:** cada campo explica qué hace, y una base de conocimiento de modding que también consulta la IA.
 
 ## Documentación
@@ -20,6 +20,7 @@ Estudio de mods de Minecraft con IA integrada. Es una variante de [MCreator](htt
 | [02 · Arquitectura](docs/02-arquitectura.md) | Cómo está construido MCgod y por qué |
 | [03 · Hoja de ruta](docs/03-hoja-de-ruta.md) | Fases del proyecto y su avance |
 | [04 · Decisiones](docs/04-decisiones.md) | Registro de decisiones con fecha y motivo |
+| [05 · Guía de redacción](docs/05-guia-de-redaccion.md) | Cómo se escriben los textos del proyecto y qué frases están prohibidas |
 
 ## Ejecutar en desarrollo (Windows)
 
@@ -27,6 +28,13 @@ Requisitos: [Rust](https://rustup.rs/) estable, [Node.js](https://nodejs.org/) L
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
+```
+
+Pruebas:
+
+```powershell
+npm --prefix app test
+cargo test --workspace
 ```
 
 Para estudiar el código de referencia de MCreator:

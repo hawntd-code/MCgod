@@ -10,6 +10,9 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 - [x] Repositorio con licencia GPL-3.0 y aviso de origen
 - [x] App Tauri que abre con el diseño base: árbol de elementos, área de trabajo, panel de IA y consola
 - [x] El motor en Rust detecta el entorno (sistema y Java) y la interfaz lo muestra
+- [x] Interfaz en español e inglés
+- [x] Guía de redacción con prueba automática
+- [x] Pruebas de interfaz (Vitest) y del motor (cargo test)
 - [ ] Integración continua en GitHub (compilar y probar en cada cambio)
 
 ## Fase 1 · Núcleo compatible

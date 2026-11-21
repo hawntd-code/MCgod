@@ -5,9 +5,12 @@ import "@fontsource-variable/onest";
 import "@fontsource-variable/jetbrains-mono";
 import "./styles.css";
 import { App } from "./App";
+import { I18nProvider } from "./i18n";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <I18nProvider>
+      <App />
+    </I18nProvider>
   </StrictMode>,
 );

@@ -80,7 +80,11 @@ pub fn parse_java_version(text: &str) -> Option<JavaInfo> {
         .filter(|name| name.chars().any(|c| c.is_alphabetic()))
         .map(str::to_string);
 
-    Some(JavaInfo { version, major, vendor })
+    Some(JavaInfo {
+        version,
+        major,
+        vendor,
+    })
 }
 
 #[cfg(test)]
@@ -110,5 +114,50 @@ mod tests {
     #[test]
     fn not_java() {
         assert_eq!(parse_java_version("'java' is not recognized"), None);
+    }
+
+    #[test]
+    fn java_ea_build_without_vendor_token() {
+        let out = "openjdk version \"26-ea\" 2026-03-17\n\
+                   OpenJDK Runtime Environment (build 26-ea+30-2840)\n";
+        let info = parse_java_version(out).unwrap();
+        assert_eq!(info.version, "26-ea");
+        assert_eq!(info.major, Some(26));
+        assert_eq!(info.vendor, None);
+    }
+
+    #[test]
+    fn skips_picked_up_lines_before_version() {
+        // Con JAVA_TOOL_OPTIONS, Java imprime una línea extra antes de la versión.
+        let out = "Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8\n\
+                   openjdk version \"21.0.5\" 2024-10-15 LTS\n\
+                   OpenJDK Runtime Environment Microsoft-10377968 (build 21.0.5+11-LTS)\n";
+        let info = parse_java_version(out).unwrap();
+        assert_eq!(info.major, Some(21));
+        assert_eq!(info.vendor.as_deref(), Some("Microsoft"));
+    }
+
+    #[test]
+    fn detect_reports_app_version_and_os() {
+        let env = detect();
+        assert_eq!(env.app_version, env!("CARGO_PKG_VERSION"));
+        assert!(!env.os.is_empty());
+    }
+
+    #[test]
+    fn serializes_in_camel_case_for_the_ui() {
+        let env = Environment {
+            app_version: "0.1.0".into(),
+            os: "Windows x86_64".into(),
+            java: Some(JavaInfo {
+                version: "21".into(),
+                major: Some(21),
+                vendor: None,
+            }),
+        };
+        let json = serde_json::to_value(&env).unwrap();
+        assert_eq!(json["appVersion"], "0.1.0");
+        assert_eq!(json["java"]["major"], 21);
+        assert!(json["java"]["vendor"].is_null());
     }
 }

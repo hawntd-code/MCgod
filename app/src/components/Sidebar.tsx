@@ -1,60 +1,27 @@
 import { Search } from "lucide-react";
+import { useI18n } from "../i18n";
 import type { Activity } from "./ActivityRail";
 
-const content: Record<Activity, { title: string; emptyTitle: string; emptyText: string; phase: string }> = {
-  elements: {
-    title: "Elementos",
-    emptyTitle: "Ningún proyecto abierto",
-    emptyText:
-      "Aquí verás los ítems, bloques, criaturas, dimensiones y procedures de tu mod, agrupados por tipo y con su vista previa.",
-    phase: "Abrir workspaces de MCreator llega en la fase 1.",
-  },
-  resources: {
-    title: "Recursos",
-    emptyTitle: "Sin recursos todavía",
-    emptyText:
-      "Texturas, sonidos, modelos 3D y estructuras del proyecto. Podrás pintarlos, importarlos y previsualizarlos sin salir de la app.",
-    phase: "El editor de texturas llega en la fase 2.",
-  },
-  variables: {
-    title: "Variables",
-    emptyTitle: "Sin variables",
-    emptyText:
-      "Las variables globales, de mundo y de jugador que usan tus procedures para guardar datos entre partidas.",
-    phase: "Llegan con los procedures en la fase 3.",
-  },
-  search: {
-    title: "Buscar",
-    emptyTitle: "Nada que buscar aún",
-    emptyText: "Busca elementos, campos, referencias rotas y texto dentro de todo el proyecto.",
-    phase: "La búsqueda global llega en la fase 5.",
-  },
-  knowledge: {
-    title: "Base de conocimiento",
-    emptyTitle: "Qué hace cada opción",
-    emptyText:
-      "Guías de modding y la explicación de cada campo de cada editor, en español. La misma información que consulta la IA.",
-    phase: "Se integra en la fase 6, con 729 textos de ayuda de MCreator como punto de partida.",
-  },
-};
-
 export function Sidebar({ activity }: { activity: Activity }) {
-  const c = content[activity];
+  const { m } = useI18n();
+  const c = m.sidebar[activity];
 
   return (
-    <aside className="flex h-full flex-col bg-surface">
+    <aside className="flex h-full flex-col bg-surface" aria-labelledby="sidebar-title">
       <div className="flex h-10 shrink-0 items-center px-4">
-        <h2 className="font-display text-h3 font-[650] [font-stretch:110%]">{c.title}</h2>
+        <h2 id="sidebar-title" className="font-display text-h3 font-[650] [font-stretch:110%]">
+          {c.title}
+        </h2>
       </div>
 
       {activity === "elements" && (
         <div className="px-3 pb-3">
           <label className="flex h-8 items-center gap-2 rounded-ui border border-line bg-ground px-2.5 text-ink-faint">
             <Search className="size-3.5 shrink-0" aria-hidden />
-            <span className="sr-only">Filtrar elementos</span>
+            <span className="sr-only">{m.sidebar.filter}</span>
             <input
               disabled
-              placeholder="Filtrar elementos"
+              placeholder={m.sidebar.filter}
               className="w-full bg-transparent text-small text-ink outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
             />
           </label>
