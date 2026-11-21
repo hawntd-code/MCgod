@@ -69,7 +69,23 @@ flowchart LR
 | `mcgod-kb` | Rust | Índice y búsqueda sobre la ayuda de MCreator + documentación propia de modding |
 | `mcgod-mcp` | Rust | Servidor MCP que expone las mismas herramientas que usa el chat integrado |
 
-Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri`, `crates/mcgod-workspace`, `crates/mcgod-gradle` y `crates/mcgod-ftl`.
+Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri`, `crates/mcgod-workspace`, `crates/mcgod-gradle`, `crates/mcgod-ftl` y `crates/mcgod-generator`. Los plugins de MCreator que lee el generador están en [`plugins/`](../plugins/README.md).
+
+### El generador (`mcgod-generator`)
+
+Sigue el mismo recorrido que `net.mcreator.generator.Generator`:
+
+1. **Configuración.** Lee `generator.yaml` del generador del proyecto (p. ej. `neoforge-1.21.1`) y de los que importa (`datapack-1.21.1`), las definiciones de cada tipo (`item.definition.yaml`), los tipos base (`common.items.yaml`), los fragmentos y las tablas de nombres (`mappings/*.yaml`, el generador primero y los importados después).
+2. **Elementos.** Cada `elements/<Nombre>.mod.json` se convierte en un objeto de plantilla con el esquema de su clase de MCreator: campos con su tipo y su valor por defecto, y los métodos que usan las plantillas (`hasNormalModel()`, `getModels()`…). Los valores traducibles (`MappableElement`) se escriben con su tabla de `mappings`: `MATERIALS` → `CreativeModeTabs.INGREDIENTS`.
+3. **Plantillas.** Primero las globales de cada tipo y tipo base (`RubymodModItems.java`), luego las base del mod (`RubymodMod.java`, `neoforge.mods.toml`, `pack.mcmeta`, pestañas creativas) y al final las de cada elemento (`RubyItem.java`, el modelo JSON). Las condiciones (`hasSounds()`, `!damageCount #= 0`, `${data.getModels()?has_content}`) se evalúan igual que en `TemplateExpressionParser`.
+4. **Idiomas.** Las `localizationkeys` de cada elemento se suman al `language_map` del proyecto (en inglés siempre; en los demás idiomas solo si falta la clave) y se escribe un `<idioma>.json` por idioma.
+5. **Posproceso por escritor.** Java: se conservan los bloques de código del usuario, se agregan los imports y se da formato. JSON: se reescribe con el formato de Gson. Solo se escriben los archivos que cambiaron, así Gradle no recompila de más.
+
+Lo que MCgod todavía no genera (otros tipos de elemento, sonidos, variables, etiquetas, procedures) se informa con un código estable y la interfaz lo muestra traducido. Un elemento con código bloqueado se respeta, como en MCreator.
+
+**Imports.** Las plantillas de MCreator no escriben imports: MCreator busca cada nombre que usa el código en un índice de todas las clases del proyecto (`ImportFormat`). MCgod arma el mismo índice: una tarea de Gradle que agrega con un script de inicio (`mcgodClasspath`) escribe el classpath de compilación, y se leen las clases públicas de esos JAR, de los módulos del JDK (`jmods`) y del propio mod. El índice se guarda en `.mcreator/mcgod/` del proyecto y solo se rehace cuando cambia la configuración de Gradle. Los nombres repetidos se resuelven con las reglas de MCreator: un import existente gana, después las clases del mod, después `priority_imports` y por último `duplicates_whitelist` del generador.
+
+**Formato.** MCreator formatea con el formateador de Eclipse. MCgod tiene uno propio con el mismo resultado general: tabuladores, las sentencias partidas se unen en una línea, una línea en blanco entre métodos y el cuerpo de un `if` sin llaves sangrado.
 
 ### El intérprete de plantillas (`mcgod-ftl`)
 
@@ -86,7 +102,13 @@ Los objetos del generador (`settings`, `generator`, `w`, `data`…) se exponen c
 
 ### Cómo se compila y se abre Minecraft
 
-`mcgod-gradle` llama al `gradlew` del proyecto igual que MCreator llama a Gradle (`GradleUtils.java`):
+Al pulsar **Compilar** o **Probar en Minecraft**, la app hace tres pasos y los muestra en la consola:
+
+1. Si falta el índice de clases del proyecto (o cambió su configuración de Gradle), lo arma.
+2. Genera el código del mod y escribe lo que cambió. Si alguna plantilla falla, no escribe nada y la tarea termina como fallida.
+3. Corre la tarea de Gradle pedida (`build` o `runClient`).
+
+"Detener" corta la preparación del índice y la tarea de Gradle; la generación tarda menos de un segundo. `mcgod-gradle` llama al `gradlew` del proyecto igual que MCreator llama a Gradle (`GradleUtils.java`):
 
 - **Java fijo:** `JAVA_HOME` y `-Porg.gradle.java.installations.paths` apuntan al JDK detectado, sin autodetección.
 - **Entorno limpio:** se quitan `JAVA_TOOL_OPTIONS`, `GRADLE_OPTS`, `CI` y otras variables que cambian el resultado.
@@ -130,5 +152,5 @@ El diseño de las herramientas parte de las 25 que ya tiene el MCP de MCreator (
 | FreeMarker es un lenguaje grande | Implementamos solo lo que usan las plantillas reales y lo medimos con pruebas |
 | Las plantillas llaman 107 métodos Java | Los portamos uno a uno en Rust, con pruebas por método |
 | El código generado podría diferir del de MCreator | Pruebas "golden": generar el mismo workspace con MCreator real y con el nuestro, y comparar |
-| Roaster ordena imports y formatea | Implementar orden de imports propio; el formato exacto no es requisito si compila igual |
+| Roaster ordena imports y formatea | Organizador de imports propio con las reglas de `ImportFormat` y formateador propio; el formato exacto de Eclipse no es requisito si compila igual |
 | Alcance enorme | Fases cortas con algo usable al final de cada una |

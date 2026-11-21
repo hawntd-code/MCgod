@@ -24,10 +24,13 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 - [x] Proyecto de ejemplo `examples/rubymod` que compila y abre Minecraft con el mod cargado
 - [ ] `mcgod-workspace`: guardar cambios con el mismo formato
 - [x] `mcgod-ftl`: intérprete FreeMarker con lo que usan las plantillas reales (analiza las 2,212 plantillas de los plugins de MCreator; tres plantillas reales producen el mismo resultado que FreeMarker)
-- [ ] `mcgod-generator`: generar el tipo **Item** para NeoForge 1.21.1 (el generador LTS de MCreator)
+- [x] `mcgod-generator`: generar el tipo **Item** para NeoForge 1.21.1 (el generador LTS de MCreator), con el registro de ítems, la pestaña creativa, el modelo, los textos en cada idioma, los imports y el formato
+- [x] La app genera el código antes de compilar o abrir Minecraft y resume en la consola qué se generó y qué falta
 - [ ] Pruebas golden contra MCreator real
 
-**Resultado:** un ítem creado a mano en un workspace se compila y aparece en el juego.
+**Resultado:** un ítem creado a mano en un workspace se genera, se compila y el juego carga el mod (probado con `examples/rubymod`).
+
+Pendiente para cerrar la fase: etiquetas (tags), sonidos y variables globales, que hoy se informan como no generados.
 
 ## Fase 2 · Primer flujo completo con IA
 

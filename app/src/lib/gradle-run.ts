@@ -84,6 +84,10 @@ export function useGradleRun(backend: Backend) {
           if (event.kind === "lines") {
             pending.current.push(...event.lines);
             schedule();
+          } else if (event.kind === "codegen") {
+            // La consola escribe estos avisos en el idioma de la persona.
+            pending.current.push({ stream: "mcgod", text: "", codegen: event });
+            schedule();
           } else {
             flush();
             setRun({ status: "done", task, outcome: event.outcome, exitCode: event.exitCode, durationMs: event.durationMs });

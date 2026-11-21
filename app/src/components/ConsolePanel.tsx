@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useI18n } from "../i18n";
 import type { OutputLine } from "../lib/engine";
 import { formatDuration, isRunning, toneOf, type LineTone, type RunState } from "../lib/gradle-run";
+import { codegenLines } from "./CodegenLines";
 import { errorMessage } from "./ErrorNotice";
 
 type Tab = "gradle" | "ai";
@@ -184,11 +185,20 @@ export function ConsolePanel({ run, lines, dropped, onStop, onClear }: Props) {
         ) : (
           <div key="output" data-testid="gradle-output" className="animate-fade">
             {dropped > 0 && <p className="pb-1 text-ink-faint">{m.console.hidden(dropped)}</p>}
-            {lines.map((line, i) => (
-              <div key={i} className={`whitespace-pre-wrap break-all ${toneClass[toneOf(line.text)]}`}>
-                {line.text || " "}
-              </div>
-            ))}
+            {lines.map((line, i) =>
+              line.stream === "mcgod" ? (
+                codegenLines(line.codegen, m).map((l, j) => (
+                  <div key={`${i}-${j}`} data-source="mcgod" className={`whitespace-pre-wrap break-all ${toneClass[l.tone]}`}>
+                    <span className="text-brand">{m.codegen.prefix} · </span>
+                    {l.text}
+                  </div>
+                ))
+              ) : (
+                <div key={i} className={`whitespace-pre-wrap break-all ${toneClass[toneOf(line.text)]}`}>
+                  {line.text || " "}
+                </div>
+              ),
+            )}
           </div>
         )}
       </div>

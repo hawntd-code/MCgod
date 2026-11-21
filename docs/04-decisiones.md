@@ -58,6 +58,22 @@ Primero se resolvió el ciclo compilar → abrir Minecraft → ver la consola, c
 
 No hay una implementación de FreeMarker en Rust, y traducir las ~1,000 plantillas por generador a otro lenguaje rompería la compatibilidad con los plugins de MCreator. Se escribió `mcgod-ftl` con exactamente lo que usan esas plantillas, medido antes de empezar. Se valida de dos formas: analiza las 2,212 plantillas de los plugins sin error, y tres plantillas reales (`neoforge.mods.toml`, `pack.mcmeta` y la clase principal del mod) producen el resultado que da FreeMarker, carácter por carácter.
 
+## 2026-11-21 · Los plugins de generación de MCreator van en el repositorio
+
+La app necesita las plantillas y definiciones al generar, también instalada. Se copió sin cambios el plugin `generator-1.21.1` de MCreator a `plugins/` (1,169 archivos, 1.6 MB) y se empaqueta como recurso de la app. Ver [plugins/README.md](../plugins/README.md).
+
+## 2026-11-21 · El índice de imports sale de Gradle
+
+MCreator obtiene el classpath del proyecto con la API de Gradle. MCgod le agrega una tarea al proyecto con un script de inicio (`--init-script`), sin tocar sus archivos, y lee las clases de esos JAR y de los módulos del JDK. El índice queda en caché en `.mcreator/mcgod/` y solo se rehace cuando cambia la configuración de Gradle; la primera vez tarda unos segundos más.
+
+## 2026-11-21 · Generar antes de cada compilación
+
+Como en MCreator, compilar o probar en Minecraft regenera el código primero. Solo se escriben los archivos que cambiaron. Si una plantilla falla, no se escribe nada y la tarea se detiene antes de llamar a Gradle.
+
+## 2026-11-21 · Generar lo que se sabe y decir lo que falta
+
+Un proyecto real mezcla tipos que MCgod ya genera con tipos que todavía no. En lugar de negarse a compilar, MCgod genera los que sabe y la consola lista los demás como pendientes. Los avisos viajan como códigos (`variablesPending`, `tagsPending`…) para que la interfaz los muestre en el idioma de la persona.
+
 ## 2026-11-21 · Regla de redacción sin frases genéricas
 
 Nada de muletillas, clichés de marketing ni fórmulas típicas de texto generado por IA, en ningún texto del proyecto. Ver la [guía de redacción](05-guia-de-redaccion.md); una prueba automática la hace cumplir.

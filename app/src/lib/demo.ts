@@ -3,7 +3,7 @@
  * Refleja el workspace de prueba del motor: crates/mcgod-workspace/tests/fixtures/rubymod.
  * No lo generó MCreator; está escrito a mano siguiendo su formato.
  */
-import type { ElementDefinition, WorkspaceSummary } from "./engine";
+import type { CodegenReport, ElementDefinition, WorkspaceSummary } from "./engine";
 
 export const DEMO_FILE = "demo://rubymod/rubymod.mcreator";
 
@@ -31,6 +31,27 @@ export const demoSummary: WorkspaceSummary = {
   tags: 1,
   languages: ["en_us", "es_mx"],
   hasGradle: true,
+};
+
+/** Resumen real de generar examples/rubymod con el generador NeoForge 1.21.1. */
+export const demoCodegenReport: CodegenReport = {
+  files: 9,
+  written: 0,
+  unchanged: 9,
+  generated: ["Ruby"],
+  skipped: [
+    { name: "RubyBlock", elementType: "block", reason: { kind: "unsupported" } },
+    { name: "RubyOre", elementType: "block", reason: { kind: "unsupported" } },
+    { name: "RubyPickaxe", elementType: "tool", reason: { kind: "unsupported" } },
+    { name: "RubyBlockRecipe", elementType: "recipe", reason: { kind: "unsupported" } },
+    { name: "GlowOnStep", elementType: "procedure", reason: { kind: "locked" } },
+    { name: "RubyUtils", elementType: "code", reason: { kind: "locked" } },
+  ],
+  notes: [
+    { code: "variablesPending", detail: null },
+    { code: "tagsPending", detail: null },
+  ],
+  errors: [],
 };
 
 /**

@@ -55,6 +55,12 @@ pub(crate) fn apply(
     }
 
     let v = run.eval(target)?;
+    // Un objeto de Java que se escribe como texto se comporta como texto en los
+    // built-ins (`mappedBlock?trim`, `?starts_with`…), igual que un StringModel.
+    let v = match &v {
+        Value::Object(o) if name != "is_hash" => o.to_text().map(Value::str).unwrap_or(v),
+        _ => v,
+    };
     let mut a = Vec::new();
     for e in args.unwrap_or(&[]) {
         a.push(run.eval(e)?);
@@ -74,6 +80,9 @@ pub(crate) fn apply(
         match a.get(i) {
             Some(Value::Str(s)) => Ok(s.to_string()),
             Some(Value::Num(n)) => Ok(format_number(*n)),
+            Some(other @ Value::Object(_)) if other.text().is_some() => {
+                Ok(other.text().unwrap_or_default())
+            }
             Some(other) => Err(fail(format!(
                 "?{name}: el argumento {} debe ser texto, es {}",
                 i + 1,
@@ -348,6 +357,7 @@ pub(crate) fn has_content(v: &Value) -> bool {
         Value::Str(s) => !s.is_empty(),
         Value::Seq(s) => !s.is_empty(),
         Value::Hash(m) => !m.is_empty(),
+        Value::Object(o) => !o.is_empty(),
         _ => true,
     }
 }

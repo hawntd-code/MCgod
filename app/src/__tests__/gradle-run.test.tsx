@@ -97,6 +97,44 @@ describe("compilar y probar en Minecraft", () => {
     expect(screen.getByRole("button", { name: "Compilar" })).toBeEnabled();
   });
 
+  it("antes de compilar genera el código y resume qué se generó y qué falta", async () => {
+    const user = await openProject();
+    await user.click(screen.getByRole("button", { name: "Compilar" }));
+    const output = await screen.findByTestId("gradle-output");
+    const mcgod = () => within(output).getAllByText((_, el) => el?.getAttribute("data-source") === "mcgod");
+    await waitFor(() => expect(mcgod().length).toBeGreaterThan(3));
+    const texts = mcgod().map((el) => el.textContent);
+    expect(texts[0]).toBe("MCgod · Generando el código del mod…");
+    expect(texts).toContain("MCgod · Código generado: 9 archivos, 0 con cambios. Elementos: Ruby.");
+    expect(texts).toContain(
+      "MCgod · Todavía sin generar (MCgod aún no genera estos tipos): RubyBlock (Bloque), RubyOre (Bloque), RubyPickaxe (Herramienta), RubyBlockRecipe (Receta).",
+    );
+    expect(texts).toContain("MCgod · Código bloqueado, se conserva como está: GlowOnStep, RubyUtils.");
+    expect(texts).toContain("MCgod · Las variables globales todavía no se generan.");
+    const summary = mcgod().find((el) => el.textContent?.includes("Código generado"));
+    expect(summary).toHaveClass("text-ok");
+  });
+
+  it("si una plantilla falla, la consola lo dice y la tarea termina como fallida", async () => {
+    const backend = createBrowserBackend(true);
+    backend.runGradle = async (_task, onEvent) => {
+      onEvent({ kind: "codegen", stage: "generating" });
+      onEvent({
+        kind: "codegen",
+        stage: "generated",
+        report: { files: 0, written: 0, unchanged: 0, generated: [], skipped: [], notes: [], errors: ["Ruby: item/item.java.ftl, línea 3: falta x"] },
+      });
+      onEvent({ kind: "finished", outcome: "failed", exitCode: null, durationMs: 10 });
+    };
+    const user = await openProject(backend);
+    await user.click(screen.getByRole("button", { name: "Compilar" }));
+    const output = await screen.findByTestId("gradle-output");
+    const failed = await within(output).findByText(/No se pudo generar el código: falló 1 plantilla/);
+    expect(failed.closest("div")).toHaveClass("text-error");
+    expect(within(output).getByText(/item\/item\.java\.ftl, línea 3/)).toBeInTheDocument();
+    expect(await screen.findByText(/Compilar: falló/)).toBeInTheDocument();
+  });
+
   it("abre Minecraft y lo detiene", async () => {
     const user = await openProject();
     await user.click(screen.getByRole("button", { name: /Probar en Minecraft/ }));

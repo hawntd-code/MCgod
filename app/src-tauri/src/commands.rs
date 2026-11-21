@@ -3,14 +3,16 @@
 //! Cada comando delega en una función normal que recibe `&AppState`, para poder
 //! probarla sin levantar la ventana.
 
+use crate::codegen::{self, CodegenEvent, Stage};
 use crate::settings::{AppSettings, RecentWorkspace, SettingsStore};
+use mcgod_generator::index;
 use mcgod_gradle::java::JavaInfo;
-use mcgod_gradle::{GradleEvent, GradleRequest, RunHandle};
+use mcgod_gradle::{GradleEvent, GradleRequest, Outcome, RunHandle};
 use mcgod_workspace::model::ElementDefinition;
 use mcgod_workspace::{Workspace, WorkspaceError, WorkspaceSummary};
 use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tauri::ipc::Channel;
 use tauri::{Manager, State};
 
@@ -70,7 +72,7 @@ pub struct CommandError {
 }
 
 impl CommandError {
-    fn new(code: &'static str, detail: impl ToString) -> Self {
+    pub(crate) fn new(code: &'static str, detail: impl ToString) -> Self {
         CommandError {
             code,
             detail: detail.to_string(),
@@ -195,6 +197,7 @@ pub fn gradle_request_in(
         tasks: vec![task.gradle_name().to_string()],
         java_home: java.home_path(),
         max_heap_mb: GRADLE_HEAP_MB,
+        extra_args: Vec::new(),
     })
 }
 
@@ -236,17 +239,108 @@ pub fn read_element(name: String, state: State<'_, AppState>) -> CmdResult<Eleme
     read_element_in(&state, &name)
 }
 
-/// Compila (`build`) o abre Minecraft (`runClient`). La salida llega por `on_event`;
-/// el comando responde en cuanto Gradle arranca.
+/// Evento del canal de una tarea: salida de Gradle o avance de la generación de código.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(untagged)]
+pub enum RunEvent {
+    Gradle(GradleEvent),
+    Codegen(CodegenEvent),
+}
+
+/// Pide a Gradle el classpath del proyecto para el índice de clases. Mientras corre,
+/// "Detener" lo cancela. Devuelve cómo terminó.
+fn write_classpath(
+    state: &AppState,
+    req: &GradleRequest,
+    on_event: &Channel<RunEvent>,
+) -> CmdResult<Outcome> {
+    let script = index::write_init_script(&req.root, mcgod_gradle::CLASSPATH_INIT_SCRIPT)
+        .map_err(|e| CommandError::new("io", format!("classpath.gradle: {e}")))?;
+    let paths = index::paths(&req.root);
+    let cp_req = mcgod_gradle::classpath_request(
+        &req.root,
+        &script,
+        &paths.classpath,
+        req.java_home.clone(),
+        GRADLE_HEAP_MB,
+    );
+    let outcome: Arc<Mutex<Option<Outcome>>> = Arc::new(Mutex::new(None));
+    let sink_outcome = outcome.clone();
+    let channel = on_event.clone();
+    let handle = mcgod_gradle::start(&cp_req, move |event| match event {
+        // El final de esta etapa no es el final de la tarea: no se reenvía.
+        GradleEvent::Finished { outcome, .. } => {
+            *sink_outcome.lock().expect("resultado bloqueado") = Some(outcome);
+        }
+        lines => {
+            let _ = channel.send(RunEvent::Gradle(lines));
+        }
+    })
+    .map_err(|e| CommandError::new("gradleStart", e))?;
+    *state.gradle.lock().expect("gradle bloqueado") = Some(handle);
+    loop {
+        if let Some(o) = *outcome.lock().expect("resultado bloqueado") {
+            *state.gradle.lock().expect("gradle bloqueado") = None;
+            return Ok(o);
+        }
+        std::thread::sleep(Duration::from_millis(100));
+    }
+}
+
+/// Compila (`build`) o abre Minecraft (`runClient`). Antes genera el código del mod,
+/// como MCreator. La salida y el avance llegan por `on_event`; el comando responde en
+/// cuanto Gradle arranca la tarea pedida.
 #[tauri::command]
 pub async fn gradle_run(
     task: GradleTask,
-    on_event: Channel<GradleEvent>,
+    on_event: Channel<RunEvent>,
     app: tauri::AppHandle,
 ) -> CmdResult<()> {
     tauri::async_runtime::spawn_blocking(move || {
         let state = app.state::<AppState>();
         let req = gradle_request_in(&state, task, mcgod_gradle::java::detect())?;
+        let workspace_file = state
+            .workspace
+            .lock()
+            .expect("workspace bloqueado")
+            .as_ref()
+            .map(|w| w.file.clone())
+            .ok_or_else(|| CommandError::new("noWorkspace", "no hay un proyecto abierto"))?;
+        let started = Instant::now();
+        let finish = |outcome: Outcome| {
+            let _ = on_event.send(RunEvent::Gradle(GradleEvent::Finished {
+                outcome,
+                exit_code: None,
+                duration_ms: started.elapsed().as_millis() as u64,
+            }));
+        };
+
+        // 1. Índice de clases para los imports (solo la primera vez o si cambió Gradle).
+        if index::classpath_is_stale(&req.root) {
+            let _ = on_event.send(RunEvent::Codegen(CodegenEvent::stage(Stage::Indexing)));
+            let outcome = write_classpath(&state, &req, &on_event)?;
+            if outcome != Outcome::Success {
+                finish(outcome);
+                return Ok(());
+            }
+        }
+
+        // 2. Código del mod.
+        let _ = on_event.send(RunEvent::Codegen(CodegenEvent::stage(Stage::Generating)));
+        let plugins = codegen::plugins_dir(app.path().resource_dir().ok())
+            .ok_or_else(|| CommandError::new("noPlugins", "plugins"))?;
+        let report = codegen::generate(&workspace_file, &plugins, req.java_home.as_deref())?;
+        let failed = !report.errors.is_empty();
+        let _ = on_event.send(RunEvent::Codegen(CodegenEvent {
+            stage: Stage::Generated,
+            report: Some(report),
+        }));
+        if failed {
+            finish(Outcome::Failed);
+            return Ok(());
+        }
+
+        // 3. La tarea pedida.
         log::info!("gradle {} en {}", task.gradle_name(), req.root.display());
         let app_for_sink = app.clone();
         let handle = mcgod_gradle::start(&req, move |event| {
@@ -254,7 +348,7 @@ pub async fn gradle_run(
             if let GradleEvent::Finished { outcome, .. } = &event {
                 log::info!("gradle terminó: {outcome:?}");
             }
-            let _ = on_event.send(event);
+            let _ = on_event.send(RunEvent::Gradle(event));
             if finished {
                 *app_for_sink
                     .state::<AppState>()

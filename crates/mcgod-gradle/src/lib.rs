@@ -59,6 +59,8 @@ pub struct GradleRequest {
     pub java_home: Option<PathBuf>,
     /// Memoria máxima del proceso de Gradle, en MB.
     pub max_heap_mb: u32,
+    /// Argumentos adicionales después de las tareas (`--init-script`, `-P…`).
+    pub extra_args: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -136,7 +138,61 @@ pub fn gradle_args(req: &GradleRequest) -> Vec<String> {
             home.display().to_string().replace('\\', "/")
         ));
     }
+    args.extend(req.extra_args.iter().cloned());
     args
+}
+
+/// Script de inicio de Gradle que agrega la tarea `mcgodClasspath`: escribe el classpath
+/// de compilación del proyecto (un JAR por línea) en el archivo de la propiedad
+/// `mcgod.classpathOut`. MCgod lo usa para saber qué clases puede importar el código
+/// generado, como MCreator con la API de Gradle.
+pub const CLASSPATH_INIT_SCRIPT: &str = r#"// Generado por MCgod: escribe el classpath de compilación para el índice de imports.
+allprojects {
+    plugins.withId('java') {
+        def outPath = providers.gradleProperty('mcgod.classpathOut')
+        if (outPath.isPresent()) {
+            def out = file(outPath.get())
+            def cp = sourceSets.main.compileClasspath
+            tasks.register('mcgodClasspath') {
+                inputs.files(cp)
+                doLast {
+                    out.parentFile.mkdirs()
+                    out.text = cp.files.collect { it.absolutePath }.join('\n')
+                }
+            }
+        }
+    }
+}
+"#;
+
+/// Petición para escribir el classpath del proyecto en `out` con `CLASSPATH_INIT_SCRIPT`
+/// (que debe estar guardado en `init_script`).
+pub fn classpath_request(
+    root: &Path,
+    init_script: &Path,
+    out: &Path,
+    java_home: Option<PathBuf>,
+    max_heap_mb: u32,
+) -> GradleRequest {
+    // Gradle corre en la carpeta del proyecto: las rutas tienen que ser absolutas.
+    let abs = |p: &Path| std::path::absolute(p).unwrap_or_else(|_| p.to_path_buf());
+    let (init_script, out) = (abs(init_script), abs(out));
+    GradleRequest {
+        root: root.to_path_buf(),
+        tasks: vec!["mcgodClasspath".into()],
+        java_home,
+        max_heap_mb,
+        extra_args: vec![
+            "--init-script".into(),
+            init_script.display().to_string(),
+            format!(
+                "-Pmcgod.classpathOut={}",
+                out.display().to_string().replace('\\', "/")
+            ),
+            // La tarea se agrega desde fuera del proyecto: sin caché de configuración.
+            "--no-configuration-cache".into(),
+        ],
+    }
 }
 
 pub fn build_command(req: &GradleRequest) -> Result<Command, GradleError> {

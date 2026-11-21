@@ -485,14 +485,22 @@ impl<'e> Run<'e> {
         let result = (|| {
             let mut positional = positional.into_iter();
             for (pname, default) in &def.params {
-                let value = if let Some(v) = positional.next() {
-                    v
-                } else if let Some(v) = named.shift_remove(pname) {
-                    v
-                } else if let Some(d) = default {
-                    self.eval(d)?
-                } else {
-                    return Err(fail(format!("falta el parámetro {pname} de {}", def.name)));
+                // Un argumento nulo cuenta como no pasado: toma el valor por defecto
+                // (FreeMarker hace lo mismo; las plantillas pasan campos nulos de Java).
+                let given = positional.next().or_else(|| named.shift_remove(pname));
+                let passed_null = given.as_ref().is_some_and(Value::is_null);
+                let value = match (given.filter(|v| !v.is_null()), default) {
+                    (Some(v), _) => v,
+                    (None, Some(d)) => self.eval(d)?,
+                    (None, None) if passed_null => {
+                        return Err(missing(format!(
+                            "el parámetro {pname} de {} se pasó sin valor",
+                            def.name
+                        )));
+                    }
+                    (None, None) => {
+                        return Err(fail(format!("falta el parámetro {pname} de {}", def.name)));
+                    }
                 };
                 self.frames[idx].locals.insert(pname.clone(), value);
             }
@@ -573,15 +581,23 @@ impl<'e> Run<'e> {
             Expr::Dot(obj, name) => {
                 let v = self.eval(obj)?;
                 match &v {
-                    Value::Hash(_) | Value::Object(_) => Ok(v.get(name).unwrap_or(Value::Null)),
+                    // Como el MapModel de FreeMarker: primero la clave, después el método de Java.
+                    Value::Hash(m) => Ok(m
+                        .get(name)
+                        .cloned()
+                        .or_else(|| crate::java::member(&v, name))
+                        .unwrap_or(Value::Null)),
+                    Value::Object(o) => Ok(o.get(name).unwrap_or(Value::Null)),
                     Value::Null => Err(missing(format!(
                         "no se puede leer .{name}: lo anterior no tiene valor ({})",
                         describe(obj)
                     ))),
-                    other => Err(fail(format!(
-                        "no se puede leer .{name} de un {}",
-                        other.type_name()
-                    ))),
+                    other => crate::java::member(other, name).ok_or_else(|| {
+                        fail(format!(
+                            "no se puede leer .{name} de un {}",
+                            other.type_name()
+                        ))
+                    }),
                 }
             }
             Expr::Index(obj, idx) => {
@@ -803,6 +819,12 @@ impl<'e> Run<'e> {
                     (Num(x), Num(y)) => x == y,
                     (Str(x), Str(y)) => x == y,
                     (Bool(x), Bool(y)) => x == y,
+                    // Un objeto que se escribe como texto se compara como texto (StringModel).
+                    (Object(_), Str(_)) | (Str(_), Object(_)) | (Object(_), Object(_))
+                        if a.text().is_some() && b.text().is_some() =>
+                    {
+                        a.text() == b.text()
+                    }
                     _ => {
                         return Err(fail(format!(
                             "no se puede comparar un {} con un {}",
@@ -870,6 +892,7 @@ impl<'e> Run<'e> {
             Value::Num(n) => Ok(format_number(*n)),
             Value::Bool(b) => Ok(b.to_string()),
             Value::Null => Err(missing("el valor no existe")),
+            Value::Object(o) if o.to_text().is_some() => Ok(o.to_text().unwrap_or_default()),
             other => Err(fail(format!(
                 "no se puede escribir un {} como texto",
                 other.type_name()

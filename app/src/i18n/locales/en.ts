@@ -126,6 +126,11 @@ export const en: Messages = {
     javaOld: "Your Java is older than 21. NeoForge mods need Java 21.",
     gradleBusy: "A Gradle task is already running.",
     gradleStart: "Gradle could not be started.",
+    noPlugins: "MCgod's generators were not found (plugins folder). Reinstall the app.",
+    unknownGenerator: "MCgod does not have the generator this project uses.",
+    noGenerator: "The project does not say which generator it uses.",
+    codegenWrite: "The generated files could not be written.",
+    noImportIndex: "The project's class index is missing. Build again to create it.",
     settingsWrite: "Settings could not be saved.",
     desktopOnly: "Opening projects only works in the desktop app.",
     internal: "Internal engine error.",
@@ -229,6 +234,32 @@ export const en: Messages = {
     taskNames: { build: "Build", runClient: "Minecraft" },
     ai: "AI activity",
     aiEmpty: "A log of every tool the AI uses will appear here: what changed, in which element and with what result.",
+  },
+  codegen: {
+    prefix: "MCgod",
+    indexing:
+      "Building the project's class index for imports. This only happens the first time or when the Gradle setup changes.",
+    generating: "Generating the mod's code…",
+    generated: (files: number, changed: number, elements: string) =>
+      `Code generated: ${files} ${files === 1 ? "file" : "files"}, ${changed} changed. Elements: ${elements}.`,
+    generatedNoElements: (files: number, changed: number) =>
+      `Code generated: ${files} mod ${files === 1 ? "file" : "files"}, ${changed} changed. No elements were generated.`,
+    failed: (count: number) =>
+      `The code could not be generated: ${count === 1 ? "1 template failed" : `${count} templates failed`}. No files were changed.`,
+    pending: (list: string) => `Not generated yet (MCgod does not generate these types yet): ${list}.`,
+    locked: (list: string) => `Locked code, kept as it is: ${list}.`,
+    notInGenerator: (list: string) => `The project's generator does not have these types: ${list}.`,
+    noDefinition: (name: string, detail: string) => `${name}: its definition could not be read (${detail}).`,
+    notes: {
+      soundsPending: "The project's sounds are not generated yet.",
+      variablesPending: "Global variables are not generated yet.",
+      tagsPending: "Tags are not generated yet.",
+      procedurePending: "An element uses a procedure that is not generated yet; that call was left out:",
+      noImportIndex: "No class index: the Java code has no imports.",
+      invalidJson: "A template produced invalid JSON and it was written as is:",
+      langFormatPending: "This generator uses .lang language files, which are not written yet.",
+      unknownElement: "There is a reference to an element that does not exist:",
+    } as Record<string, string>,
   },
   ai: {
     title: "Assistant",

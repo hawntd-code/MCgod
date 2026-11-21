@@ -161,6 +161,7 @@ fn gradle_args_match_what_mcreator_passes() {
         tasks: vec!["runClient".into()],
         java_home: Some(PathBuf::from(r"C:\Program Files\Java\jdk-21")),
         max_heap_mb: 2048,
+        extra_args: Vec::new(),
     };
     let args = gradle_args(&req);
     assert_eq!(args[0], "runClient");
@@ -196,6 +197,7 @@ fn recognizes_gradle_projects_and_creates_mcreator_gradle() {
         tasks: vec!["build".into()],
         java_home: None,
         max_heap_mb: 1024,
+        extra_args: Vec::new(),
     };
     assert!(matches!(
         build_command(&req),
@@ -225,6 +227,7 @@ fn build_command_cleans_the_environment_and_sets_java_home() {
         tasks: vec!["build".into()],
         java_home: Some(PathBuf::from("C:/jdk21")),
         max_heap_mb: 1024,
+        extra_args: Vec::new(),
     };
     let cmd = build_command(&req).unwrap();
     let envs: Vec<_> = cmd.get_envs().collect();

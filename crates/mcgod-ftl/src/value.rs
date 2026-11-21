@@ -23,6 +23,15 @@ pub trait HostObject {
     fn type_name(&self) -> &str {
         "objeto"
     }
+    /// Texto del objeto, como el `toString()` que FreeMarker usa al escribir un objeto
+    /// de Java en `${…}` o al aplicarle `?trim`. `None` si no se puede escribir.
+    fn to_text(&self) -> Option<String> {
+        None
+    }
+    /// Como `BeanModel.isEmpty()` de FreeMarker; decide `?has_content`.
+    fn is_empty(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Clone)]
@@ -109,6 +118,34 @@ impl Value {
     pub fn as_str(&self) -> Option<&str> {
         match self {
             Value::Str(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Texto de un valor escalar: textos, números, booleanos y objetos que se pueden
+    /// escribir. `None` para listas, mapas y valores sin texto.
+    pub fn text(&self) -> Option<String> {
+        match self {
+            Value::Str(s) => Some(s.to_string()),
+            Value::Num(n) => Some(format_number(*n)),
+            Value::Bool(b) => Some(b.to_string()),
+            Value::Object(o) => o.to_text(),
+            _ => None,
+        }
+    }
+
+    /// Número si lo es.
+    pub fn as_num(&self) -> Option<f64> {
+        match self {
+            Value::Num(n) => Some(*n),
+            _ => None,
+        }
+    }
+
+    /// Booleano si lo es.
+    pub fn as_bool(&self) -> Option<bool> {
+        match self {
+            Value::Bool(b) => Some(*b),
             _ => None,
         }
     }

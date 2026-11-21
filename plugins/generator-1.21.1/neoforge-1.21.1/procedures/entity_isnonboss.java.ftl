@@ -1,0 +1,1 @@
+(${input$entity}.canUsePortal(true))

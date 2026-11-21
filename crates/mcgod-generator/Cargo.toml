@@ -1,0 +1,22 @@
+[package]
+name = "mcgod-generator"
+description = "Generación de código y recursos de mods a partir de los generadores de MCreator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+mcgod-ftl = { path = "../mcgod-ftl" }
+mcgod-workspace = { path = "../mcgod-workspace" }
+indexmap = "2"
+regex = "1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+thiserror = "2"
+yaml-rust2 = "0.10"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+[dev-dependencies]
+mcgod-gradle = { path = "../mcgod-gradle" }
+tempfile = "3"

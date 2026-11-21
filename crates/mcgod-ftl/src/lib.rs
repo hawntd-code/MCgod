@@ -10,6 +10,7 @@ pub mod ast;
 mod builtins;
 mod eval;
 pub mod expr;
+pub mod java;
 pub mod lexer;
 mod parser;
 pub mod value;
@@ -145,6 +146,18 @@ impl Engine {
     pub fn render_str(&self, name: &str, src: &str, data: &Map) -> Result<String, FtlError> {
         let t = self.parse(name, src)?;
         self.run(&t, data)
+    }
+
+    /// Evalúa una expresión suelta (sin `${}`), como hace MCreator con las condiciones
+    /// `${…}` de los `.definition.yaml` y con `listData`.
+    pub fn eval_expr(&self, src: &str, data: &Map) -> Result<Value, FtlError> {
+        let e = expr::parse(src).map_err(|m| FtlError::At {
+            template: "expresión".into(),
+            line: 1,
+            message: format!("{m}: {src}"),
+        })?;
+        let mut run = eval::Run::new(self, data, "expresión".into());
+        run.eval(&e)
     }
 
     fn run(&self, t: &Template, data: &Map) -> Result<String, FtlError> {

@@ -1,5 +1,5 @@
 import { Channel, invoke, isTauri } from "@tauri-apps/api/core";
-import { demoDefinitions, DEMO_FILE, demoGradleOutput, demoSummary } from "./demo";
+import { demoCodegenReport, demoDefinitions, DEMO_FILE, demoGradleOutput, demoSummary } from "./demo";
 
 export type JavaInfo = {
   version: string;
@@ -9,11 +9,50 @@ export type JavaInfo = {
 };
 
 export type GradleTask = "build" | "runClient";
-export type OutputLine = { stream: "stdout" | "stderr"; text: string };
 export type GradleOutcome = "success" | "failed" | "cancelled";
+
+/** Por qué un elemento no se generó. */
+export type SkipReason =
+  | { kind: "locked" | "unsupported" | "notInGenerator" }
+  | { kind: "noDefinition"; detail: string };
+
+export type CodegenNoteCode =
+  | "soundsPending"
+  | "variablesPending"
+  | "tagsPending"
+  | "procedurePending"
+  | "noImportIndex"
+  | "invalidJson"
+  | "langFormatPending"
+  | "unknownElement";
+
+export type CodegenReport = {
+  files: number;
+  written: number;
+  unchanged: number;
+  generated: string[];
+  skipped: { name: string; elementType: string; reason: SkipReason }[];
+  notes: { code: CodegenNoteCode; detail: string | null }[];
+  /** Plantillas que fallaron: si hay alguna, no se escribió nada. */
+  errors: string[];
+};
+
+/** Avance de la generación de código que precede a cada compilación. */
+export type CodegenEvent = {
+  kind: "codegen";
+  stage: "indexing" | "generating" | "generated";
+  report?: CodegenReport;
+};
+
+/** Una línea de Gradle, o un aviso de MCgod que la consola escribe en el idioma de la persona. */
+export type OutputLine =
+  | { stream: "stdout" | "stderr"; text: string }
+  | { stream: "mcgod"; text: string; codegen: CodegenEvent };
+
 export type GradleEvent =
   | { kind: "lines"; lines: OutputLine[] }
-  | { kind: "finished"; outcome: GradleOutcome; exitCode: number | null; durationMs: number };
+  | { kind: "finished"; outcome: GradleOutcome; exitCode: number | null; durationMs: number }
+  | CodegenEvent;
 
 export type Environment = {
   appVersion: string;
@@ -188,6 +227,9 @@ export function createBrowserBackend(demo: boolean): Backend {
       if (gradleTimer) throw { code: "gradleBusy", detail: task } satisfies EngineError;
       const lines = demoGradleOutput(task);
       const started = Date.now();
+      // Como la app: primero se genera el código del mod.
+      onEvent({ kind: "codegen", stage: "generating" });
+      onEvent({ kind: "codegen", stage: "generated", report: structuredClone(demoCodegenReport) });
       let i = 0;
       const step = () => {
         const chunk = lines.slice(i, i + 6);

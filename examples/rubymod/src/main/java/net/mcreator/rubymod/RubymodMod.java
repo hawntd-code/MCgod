@@ -18,6 +18,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.FriendlyByteBuf;
 
+import net.mcreator.rubymod.init.RubymodModTabs;
+import net.mcreator.rubymod.init.RubymodModItems;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.Queue;
 import java.util.PriorityQueue;
@@ -28,11 +31,7 @@ import java.util.Comparator;
 import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
 
-// Clase base del mod, escrita a mano a partir de la plantilla modbase/mod.java.ftl
-// del generador NeoForge 1.21.1 de MCreator. El generador de MCgod la producirá sola.
-@Mod("rubymod")
-public class RubymodMod {
-
+@Mod("rubymod") public class RubymodMod {
 	public static final Logger LOGGER = LogManager.getLogger(RubymodMod.class);
 
 	public static final String MODID = "rubymod";
@@ -45,6 +44,9 @@ public class RubymodMod {
 
 		modEventBus.addListener(this::registerNetworking);
 
+		RubymodModItems.REGISTRY.register(modEventBus);
+		RubymodModTabs.REGISTRY.register(modEventBus);
+
 		// Start of user code block mod init
 		// End of user code block mod init
 	}
@@ -55,8 +57,7 @@ public class RubymodMod {
 	private static boolean networkingRegistered = false;
 	private static final Map<CustomPacketPayload.Type<?>, NetworkMessage<?>> MESSAGES = new HashMap<>();
 
-	private record NetworkMessage<T extends CustomPacketPayload>(StreamCodec<? extends FriendlyByteBuf, T> reader, IPayloadHandler<T> handler) {
-	}
+	private record NetworkMessage<T extends CustomPacketPayload>(StreamCodec<? extends FriendlyByteBuf, T> reader, IPayloadHandler<T> handler) {}
 
 	public static <T extends CustomPacketPayload> void addNetworkMessage(CustomPacketPayload.Type<T> id, StreamCodec<? extends FriendlyByteBuf, T> reader, IPayloadHandler<T> handler) {
 		if (networkingRegistered)
@@ -64,8 +65,7 @@ public class RubymodMod {
 		MESSAGES.put(id, new NetworkMessage<>(reader, handler));
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked"})
-	private void registerNetworking(final RegisterPayloadHandlersEvent event) {
+	@SuppressWarnings({"rawtypes", "unchecked"}) private void registerNetworking(final RegisterPayloadHandlersEvent event) {
 		final PayloadRegistrar registrar = event.registrar(MODID);
 		MESSAGES.forEach((id, networkMessage) -> registrar.playBidirectional(id, ((NetworkMessage) networkMessage).reader(), ((NetworkMessage) networkMessage).handler()));
 		networkingRegistered = true;
@@ -79,8 +79,7 @@ public class RubymodMod {
 			workToBeScheduled.add(new IntObjectImmutablePair<>(delay, action));
 	}
 
-	@SubscribeEvent
-	public void tick(ServerTickEvent.Post event) {
+	@SubscribeEvent public void tick(ServerTickEvent.Post event) {
 		int currentTick = event.getServer().getTickCount();
 
 		IntObjectPair<Runnable> work;

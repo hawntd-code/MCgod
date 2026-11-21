@@ -127,6 +127,11 @@ export const es = {
     javaOld: "Tu Java es anterior a la 21. Los mods de NeoForge necesitan Java 21.",
     gradleBusy: "Ya hay una tarea de Gradle en curso.",
     gradleStart: "No se pudo iniciar Gradle.",
+    noPlugins: "No se encontraron los generadores de MCgod (carpeta plugins). Reinstala la app.",
+    unknownGenerator: "MCgod no tiene el generador que usa este proyecto.",
+    noGenerator: "El proyecto no indica con qué generador se crea.",
+    codegenWrite: "No se pudieron escribir los archivos generados.",
+    noImportIndex: "Falta el índice de clases del proyecto. Vuelve a compilar para crearlo.",
     settingsWrite: "No se pudieron guardar los ajustes.",
     desktopOnly: "Abrir proyectos solo funciona en la app de escritorio.",
     internal: "Error interno del motor.",
@@ -230,6 +235,32 @@ export const es = {
     taskNames: { build: "Compilar", runClient: "Minecraft" } as Record<string, string>,
     ai: "Actividad de la IA",
     aiEmpty: "Aquí quedará el registro de cada herramienta que use la IA: qué cambió, en qué elemento y con qué resultado.",
+  },
+  codegen: {
+    prefix: "MCgod",
+    indexing:
+      "Preparando el índice de clases del proyecto para los imports. Solo pasa la primera vez o cuando cambia la configuración de Gradle.",
+    generating: "Generando el código del mod…",
+    generated: (files: number, changed: number, elements: string) =>
+      `Código generado: ${files} ${files === 1 ? "archivo" : "archivos"}, ${changed} con cambios. Elementos: ${elements}.`,
+    generatedNoElements: (files: number, changed: number) =>
+      `Código generado: ${files} ${files === 1 ? "archivo" : "archivos"} del mod, ${changed} con cambios. Ningún elemento se generó.`,
+    failed: (count: number) =>
+      `No se pudo generar el código: ${count === 1 ? "falló 1 plantilla" : `fallaron ${count} plantillas`}. No se cambió ningún archivo.`,
+    pending: (list: string) => `Todavía sin generar (MCgod aún no genera estos tipos): ${list}.`,
+    locked: (list: string) => `Código bloqueado, se conserva como está: ${list}.`,
+    notInGenerator: (list: string) => `El generador del proyecto no tiene estos tipos: ${list}.`,
+    noDefinition: (name: string, detail: string) => `${name}: no se pudo leer su definición (${detail}).`,
+    notes: {
+      soundsPending: "Los sonidos del proyecto todavía no se generan.",
+      variablesPending: "Las variables globales todavía no se generan.",
+      tagsPending: "Las etiquetas (tags) todavía no se generan.",
+      procedurePending: "Un elemento usa un procedure que todavía no se genera; esa llamada se omitió:",
+      noImportIndex: "Sin índice de clases: el código Java no lleva imports.",
+      invalidJson: "Una plantilla produjo JSON inválido y se escribió tal cual:",
+      langFormatPending: "Este generador usa archivos de idioma .lang, que todavía no se escriben.",
+      unknownElement: "Hay una referencia a un elemento que no existe:",
+    } as Record<string, string>,
   },
   ai: {
     title: "Asistente",

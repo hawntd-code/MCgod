@@ -32,6 +32,7 @@ fn main() {
         tasks: vec![args[1].clone()],
         java_home: java.and_then(|j| j.home_path()),
         max_heap_mb: 2048,
+        extra_args: Vec::new(),
     };
     let handle = start(&req, |event| match event {
         GradleEvent::Lines { lines } => {
