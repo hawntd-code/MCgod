@@ -13,7 +13,7 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 - [x] Interfaz en español e inglés
 - [x] Guía de redacción con prueba automática
 - [x] Pruebas de interfaz (Vitest) y del motor (cargo test)
-- [ ] Integración continua en GitHub (compilar y probar en cada cambio)
+- [x] Integración continua en GitHub (compilar y probar en cada cambio)
 
 ## Fase 1 · Núcleo compatible
 
