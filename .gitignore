@@ -1,0 +1,22 @@
+# Código de referencia (se clona aparte, no se versiona aquí)
+/reference/
+
+# Rust
+/target/
+**/target/
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+
+# Editores y sistema
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+.DS_Store
+Thumbs.db
+
+# Configuración local de herramientas de IA
+.claude/

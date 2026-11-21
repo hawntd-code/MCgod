@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/*
+  Sistema visual de MCgod
+  Mundo: un taller de pizarra profunda (deepslate) con piezas de cobre.
+  Neutros teñidos de pizarra (H 255), cobre como marca, redstone para la acción de jugar.
+*/
+@theme {
+  --color-ground: oklch(0.165 0.012 255);
+  --color-surface: oklch(0.195 0.013 255);
+  --color-raised: oklch(0.235 0.014 255);
+  --color-hover: oklch(0.27 0.015 255);
+  --color-line: oklch(0.3 0.014 255);
+  --color-line-strong: oklch(0.38 0.016 255);
+  --color-ink: oklch(0.94 0.008 255);
+  --color-ink-muted: oklch(0.72 0.016 255);
+  --color-ink-faint: oklch(0.63 0.016 255);
+
+  --color-brand: oklch(0.7 0.135 50);
+  --color-brand-bright: oklch(0.78 0.12 55);
+  --color-brand-deep: oklch(0.5 0.115 42);
+  --color-brand-ink: oklch(0.2 0.045 42);
+  --color-brand-ink-muted: oklch(0.33 0.07 42);
+
+  --color-signal: oklch(0.52 0.19 27);
+  --color-signal-ink: oklch(0.98 0.01 27);
+
+  --color-ok: oklch(0.74 0.14 155);
+  --color-warn: oklch(0.83 0.14 85);
+  --color-error: oklch(0.68 0.18 27);
+
+  --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-text: "Onest Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* Interfaz densa de herramienta: el cuerpo es 14px y los títulos de pantalla crecen mucho */
+  --text-display: clamp(3.25rem, 6.2vw, 6.5rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.035em;
+  --text-h2: 1.375rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h3: 0.9375rem;
+  --text-h3--line-height: 1.3;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.55;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.45;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.3;
+
+  --radius-ui: 4px;
+  --radius-media: 6px;
+
+  --shadow-1: 0 1px 2px oklch(0.08 0.02 255 / 0.4), 0 4px 12px oklch(0.08 0.02 255 / 0.25);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  user-select: none;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: var(--color-brand-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+html {
+  scrollbar-color: var(--color-line-strong) transparent;
+  accent-color: var(--color-brand);
+}
+
+input,
+textarea {
+  caret-color: var(--color-brand);
+  user-select: text;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+/* Textura de la bienvenida: la rejilla de 16 px de una textura de Minecraft */
+.pixel-grid {
+  background-image:
+    linear-gradient(to right, oklch(0.5 0.115 42 / 0.22) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.5 0.115 42 / 0.22) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 700ms var(--ease-out-expo) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 120ms !important;
+  }
+}

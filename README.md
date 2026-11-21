@@ -1,0 +1,50 @@
+# MCgod
+
+Estudio de mods de Minecraft con IA integrada. Es una variante de [MCreator](https://mcreator.net/) reescrita en Rust, con una interfaz nueva, un panel de chat donde conectas tu propio proveedor de IA y un servidor MCP para que cualquier agente pueda trabajar sobre tu mod.
+
+> **Estado:** fase 0 (cimientos). La app abre con su diseño base y el motor en Rust ya responde; todavía no crea ni compila mods. Ver la [hoja de ruta](docs/03-hoja-de-ruta.md).
+
+## Qué busca el proyecto
+
+- **Paridad con MCreator:** los 37 tipos de elemento, los procedures con bloques y todos sus generadores (NeoForge, Data Pack, Resource Pack y Add-Ons de Bedrock).
+- **Más ligero y fluido:** motor en Rust e interfaz web en WebView2, en lugar de Java + Swing.
+- **IA de primera clase:** chat lateral al estilo VS Code o JetBrains, con tu propia clave de API, y la posibilidad de ver a la IA construir el mod en vivo.
+- **MCP:** las mismas herramientas del chat, expuestas para Claude Code, Codex, Cursor y otros clientes.
+- **Ayuda en cada opción:** cada campo explica qué hace, y una base de conocimiento de modding que también consulta la IA.
+
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [01 · Inventario de MCreator](docs/01-inventario-mcreator.md) | Radiografía del código de MCreator: tamaño, plugins, generadores, formato de proyecto |
+| [02 · Arquitectura](docs/02-arquitectura.md) | Cómo está construido MCgod y por qué |
+| [03 · Hoja de ruta](docs/03-hoja-de-ruta.md) | Fases del proyecto y su avance |
+| [04 · Decisiones](docs/04-decisiones.md) | Registro de decisiones con fecha y motivo |
+
+## Ejecutar en desarrollo (Windows)
+
+Requisitos: [Rust](https://rustup.rs/) estable, [Node.js](https://nodejs.org/) LTS, [JDK 21](https://adoptium.net/) y WebView2 (ya viene con Windows 11).
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
+```
+
+Para estudiar el código de referencia de MCreator:
+
+```powershell
+git clone --depth 1 https://github.com/MCreator/MCreator.git reference/MCreator
+```
+
+## Estructura
+
+```
+app/              Interfaz (React + TypeScript + Tailwind)
+app/src-tauri/    Motor y puente con la interfaz (Rust + Tauri 2)
+docs/             Documentación del proyecto
+scripts/          Utilidades de desarrollo
+reference/        Código de MCreator para consulta (no se versiona)
+```
+
+## Licencia
+
+GPL-3.0. MCgod deriva de MCreator, de Pylo y sus colaboradores; ver [NOTICE.md](NOTICE.md). No es un producto oficial de Minecraft ni de MCreator.
