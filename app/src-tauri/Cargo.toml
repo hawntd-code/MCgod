@@ -1,6 +1,6 @@
 [package]
 name = "mcgod"
-description = "Estudio de mods de Minecraft con IA integrada, variante de MCreator reescrita en Rust"
+description = "Programa para crear mods de Minecraft con asistente de IA; variante de MCreator reescrita en Rust"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,8 +15,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.7.4", features = [] }
 
 [dependencies]
+mcgod-workspace = { path = "../../crates/mcgod-workspace" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "2.12.5", features = [] }
 tauri-plugin-log = "2"
+tauri-plugin-dialog = "2"
+
+[dev-dependencies]
+tempfile = "3"

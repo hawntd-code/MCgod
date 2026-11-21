@@ -1,0 +1,15 @@
+[package]
+name = "mcgod-workspace"
+description = "Lectura de workspaces de MCreator (.mcreator y elements/*.mod.json)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"

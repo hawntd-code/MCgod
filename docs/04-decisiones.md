@@ -38,6 +38,14 @@ Los dos idiomas desde el inicio. El idioma se elige en la barra de estado y se r
 
 Se suma a Anthropic, OpenAI, Gemini, Ollama y la opción compatible con OpenAI. Su API sigue el formato de OpenAI.
 
+## 2026-11-21 · La bienvenida solo aparece la primera vez
+
+La pantalla "Crea tu primer mod." se muestra en el primer arranque, con los requisitos y el idioma. El motor guarda que ya se vio en `settings.json` (carpeta de configuración de la app). Desde ahí, la app abre directo en la pantalla de proyectos: lo importante es el trabajo, no la portada.
+
+## 2026-11-21 · Abrir proyectos de MCreator primero en solo lectura
+
+MCgod ya lee workspaces de MCreator y muestra cada elemento tal como está guardado. Guardar cambios llega después, cuando haya pruebas de ida y vuelta con workspaces generados por MCreator. Así no hay riesgo de dañar proyectos reales.
+
 ## 2026-11-21 · Regla de redacción sin frases genéricas
 
 Nada de muletillas, clichés de marketing ni fórmulas típicas de texto generado por IA, en ningún texto del proyecto. Ver la [guía de redacción](05-guia-de-redaccion.md); una prueba automática la hace cumplir.

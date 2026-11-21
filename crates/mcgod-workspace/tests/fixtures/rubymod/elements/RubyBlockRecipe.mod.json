@@ -1,0 +1,20 @@
+{
+  "_fv": 92,
+  "_type": "recipe",
+  "definition": {
+    "recipeType": "Crafting",
+    "recipeShapeless": false,
+    "recipeRetstackSize": 1,
+    "group": "",
+    "cookingBookCategory": "MISC",
+    "craftingBookCategory": "BUILDING",
+    "recipeSlots": [
+      { "value": "CUSTOM:Ruby" }, { "value": "CUSTOM:Ruby" }, { "value": "CUSTOM:Ruby" },
+      { "value": "CUSTOM:Ruby" }, { "value": "CUSTOM:Ruby" }, { "value": "CUSTOM:Ruby" },
+      { "value": "CUSTOM:Ruby" }, { "value": "CUSTOM:Ruby" }, { "value": "CUSTOM:Ruby" }
+    ],
+    "recipeReturnStack": {
+      "value": "CUSTOM:RubyBlock"
+    }
+  }
+}

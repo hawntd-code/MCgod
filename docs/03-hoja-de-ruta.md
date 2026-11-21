@@ -17,7 +17,10 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 
 ## Fase 1 · Núcleo compatible
 
-- [ ] `mcgod-workspace`: abrir y guardar workspaces de MCreator sin perder datos
+- [x] `mcgod-workspace`: leer workspaces de MCreator (`.mcreator` y `elements/*.mod.json`) sin perder campos
+- [x] Bienvenida solo en el primer arranque; después, pantalla de proyectos con recientes
+- [x] Abrir un proyecto: árbol de elementos por tipo, resumen del mod y vista de cada elemento
+- [ ] `mcgod-workspace`: guardar cambios con el mismo formato
 - [ ] `mcgod-ftl`: intérprete FreeMarker con lo que usan las plantillas reales
 - [ ] `mcgod-generator`: generar el tipo **Item** para NeoForge 26.3
 - [ ] Pruebas golden contra MCreator real
@@ -27,7 +30,7 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 
 ## Fase 2 · Primer flujo completo con IA
 
-- [ ] Crear y abrir proyectos desde la app
+- [ ] Crear proyectos nuevos desde la app
 - [ ] Editores visuales de Item, Block, Recipe y Tab, con ayuda en cada opción
 - [ ] Editor y visor de texturas
 - [ ] Herramientas compartidas de IA (modelo de las 25 de MCreator)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildChecks } from "../components/Welcome";
+import { buildChecks } from "../components/Onboarding";
 import { javaStatus } from "../components/StatusBar";
 import { en } from "../i18n/locales/en";
 import { es } from "../i18n/locales/es";
@@ -14,8 +14,8 @@ const temurin21: JavaInfo = { version: "21.0.13.1", major: 21, vendor: "Temurin"
 const java17: JavaInfo = { version: "17.0.9", major: 17, vendor: "Temurin" };
 const java25: JavaInfo = { version: "25.0.1", major: 25, vendor: null };
 
-describe("requisitos de la bienvenida", () => {
-  const c = es.welcome.checks;
+describe("requisitos del primer arranque", () => {
+  const c = es.onboarding.checks;
 
   it("mientras carga, ambos requisitos están pendientes", () => {
     const checks = buildChecks({ status: "loading" }, c);
@@ -57,7 +57,7 @@ describe("requisitos de la bienvenida", () => {
   });
 
   it("en inglés usa los textos en inglés", () => {
-    const [, java] = buildChecks(ready(java17), en.welcome.checks);
+    const [, java] = buildChecks(ready(java17), en.onboarding.checks);
     expect(java.detail).toBe("You have Java 17.0.9; NeoForge mods need Java 21.");
   });
 });

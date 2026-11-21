@@ -1,4 +1,4 @@
-import { ChevronDown, Hammer, PanelBottom, PanelLeft, PanelRight, Play } from "lucide-react";
+import { Hammer, PanelBottom, PanelLeft, PanelRight, Play } from "lucide-react";
 import { useI18n } from "../i18n";
 import { BrandMark } from "./BrandMark";
 
@@ -13,12 +13,15 @@ const toggles: { key: PanelKey; shortcut: string; Icon: typeof PanelLeft }[] = [
 export function TopBar({
   open,
   onToggle,
+  projectName,
 }: {
   open: Record<PanelKey, boolean>;
   onToggle: (key: PanelKey) => void;
+  projectName: string | null;
 }) {
   const { m } = useI18n();
   const t = m.topBar;
+  const actionHint = projectName ? t.buildLater : t.needProject;
 
   return (
     <header className="flex h-11 shrink-0 items-center gap-3 border-b border-line bg-ground px-3">
@@ -27,21 +30,18 @@ export function TopBar({
         <span className="font-display text-[0.95rem] font-[750] tracking-[-0.01em] [font-stretch:118%]">MCgod</span>
       </div>
 
-      <button
-        type="button"
-        disabled
-        title={t.projectsLater}
-        className="flex h-7 items-center gap-2 rounded-ui border border-line px-2.5 text-small text-ink-muted disabled:cursor-not-allowed"
+      <span
+        data-testid="project-name"
+        className={`flex h-7 max-w-[28ch] items-center truncate rounded-ui border border-line px-2.5 text-small ${projectName ? "font-medium text-ink" : "text-ink-muted"}`}
       >
-        {t.noProject}
-        <ChevronDown className="size-3.5" aria-hidden />
-      </button>
+        {projectName ?? t.noProject}
+      </span>
 
       <div className="ml-auto flex items-center gap-1.5">
         <button
           type="button"
           disabled
-          title={t.needProject}
+          title={actionHint}
           className="flex h-7 items-center gap-1.5 rounded-ui px-2.5 text-small font-medium text-ink-muted transition-colors duration-150 hover:bg-hover disabled:cursor-not-allowed disabled:text-ink-faint disabled:hover:bg-transparent"
         >
           <Hammer className="size-3.5" aria-hidden />
@@ -50,7 +50,7 @@ export function TopBar({
         <button
           type="button"
           disabled
-          title={t.needProject}
+          title={actionHint}
           className="flex h-7 items-center gap-1.5 rounded-ui bg-signal px-3 text-small font-semibold text-signal-ink transition-[filter,opacity] duration-150 hover:brightness-110 active:brightness-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:brightness-100"
         >
           <Play className="size-3.5 fill-current" aria-hidden />

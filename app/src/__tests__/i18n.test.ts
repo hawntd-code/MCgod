@@ -23,9 +23,11 @@ describe("textos de la interfaz", () => {
   });
 
   it("todo texto largo está traducido (no es igual en los dos idiomas)", () => {
+    // Palabras que se escriben igual en ambos idiomas.
+    const sameInBoth = new Set(["elementTypes.bescript"]);
     const esTexts = new Map(collectStrings(es).map((s) => [s.path, s.text]));
     const untranslated = collectStrings(en).filter(
-      ({ path, text }) => text.length > 12 && esTexts.get(path) === text,
+      ({ path, text }) => text.length > 12 && esTexts.get(path) === text && !sameInBoth.has(path),
     );
     expect(untranslated).toEqual([]);
   });

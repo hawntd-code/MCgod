@@ -69,7 +69,16 @@ flowchart LR
 | `mcgod-kb` | Rust | Índice y búsqueda sobre la ayuda de MCreator + documentación propia de modding |
 | `mcgod-mcp` | Rust | Servidor MCP que expone las mismas herramientas que usa el chat integrado |
 
-Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)).
+Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri` y `crates/mcgod-workspace`.
+
+### Cómo se abre un proyecto hoy
+
+1. La interfaz abre el selector de archivos (plugin de diálogo de Tauri) y recibe la ruta del `.mcreator`.
+2. El comando `open_workspace` lee el archivo con `mcgod-workspace` en un hilo aparte, guarda el proyecto en recientes y devuelve un resumen: datos del mod, generador y lista de elementos con su estado.
+3. Al elegir un elemento, `read_element` lee su `elements/<Nombre>.mod.json`.
+4. Los errores llegan con un código estable (`notFound`, `invalidJson`…) y la interfaz los traduce; el detalle técnico se muestra aparte.
+
+En el navegador (desarrollo), la interfaz usa un sustituto del motor; con `?demo` en la URL carga el proyecto de ejemplo de las pruebas.
 
 ## Un solo juego de herramientas para la IA
 

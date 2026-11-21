@@ -1,0 +1,29 @@
+{
+  "_fv": 92,
+  "_type": "item",
+  "definition": {
+    "name": "Ruby",
+    "rarity": "UNCOMMON",
+    "creativeTabs": [
+      {
+        "value": "INGREDIENTS"
+      }
+    ],
+    "stackSize": 64,
+    "enchantability": 0,
+    "useDuration": 0,
+    "toolType": 1.0,
+    "damageCount": 0,
+    "destroyAnyBlock": false,
+    "immuneToFire": true,
+    "isPiglinCurrency": false,
+    "enableMeleeDamage": false,
+    "damageVsEntity": 4.0,
+    "attackSpeed": 1.2,
+    "inventorySize": 9,
+    "inventoryStackSize": 99,
+    "texture": {
+      "texture": "ruby"
+    }
+  }
+}
