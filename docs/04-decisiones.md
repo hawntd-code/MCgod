@@ -54,6 +54,10 @@ MCreator usa la Tooling API de Gradle, que es una librería de Java. MCgod llama
 
 Primero se resolvió el ciclo compilar → abrir Minecraft → ver la consola, con un proyecto de ejemplo escrito a mano a partir de las plantillas de MCreator. Así, cuando llegue el generador, su salida se prueba en el juego desde el primer día.
 
+## 2026-11-21 · Intérprete FreeMarker propio en Rust
+
+No hay una implementación de FreeMarker en Rust, y traducir las ~1,000 plantillas por generador a otro lenguaje rompería la compatibilidad con los plugins de MCreator. Se escribió `mcgod-ftl` con exactamente lo que usan esas plantillas, medido antes de empezar. Se valida de dos formas: analiza las 2,212 plantillas de los plugins sin error, y tres plantillas reales (`neoforge.mods.toml`, `pack.mcmeta` y la clase principal del mod) producen el resultado que da FreeMarker, carácter por carácter.
+
 ## 2026-11-21 · Regla de redacción sin frases genéricas
 
 Nada de muletillas, clichés de marketing ni fórmulas típicas de texto generado por IA, en ningún texto del proyecto. Ver la [guía de redacción](05-guia-de-redaccion.md); una prueba automática la hace cumplir.

@@ -54,8 +54,9 @@ git clone --depth 1 https://github.com/MCreator/MCreator.git reference/MCreator
 ```
 app/              Interfaz (React + TypeScript + Tailwind)
 app/src-tauri/    Puente entre interfaz y motor, ajustes de la app (Rust + Tauri 2)
-crates/           Piezas del motor en Rust: mcgod-workspace (lee proyectos de MCreator)
-                  y mcgod-gradle (compila y abre Minecraft)
+crates/           Piezas del motor en Rust: mcgod-workspace (lee proyectos de MCreator),
+                  mcgod-gradle (compila y abre Minecraft) y mcgod-ftl (intérprete de
+                  las plantillas FreeMarker de MCreator)
 examples/rubymod/ Proyecto de ejemplo que compila y abre Minecraft
 docs/             Documentación del proyecto
 scripts/          Utilidades de desarrollo

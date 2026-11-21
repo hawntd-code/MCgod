@@ -1,0 +1,13 @@
+[package]
+name = "mcgod-ftl"
+description = "Intérprete compatible con FreeMarker para las plantillas de generación de MCreator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+indexmap = "2"
+regex = "1"
+serde_json = { version = "1.0", features = ["preserve_order"] }
+thiserror = "2"

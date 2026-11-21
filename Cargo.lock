@@ -1945,6 +1945,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "mcgod-ftl"
+version = "0.1.0"
+dependencies = [
+ "indexmap 2.14.2",
+ "regex",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "mcgod-gradle"
 version = "0.1.0"
 dependencies = [

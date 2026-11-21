@@ -23,7 +23,7 @@ Cada fase termina con algo que se puede usar y probar. Las casillas se marcan co
 - [x] `mcgod-gradle`: compilar el mod y abrir Minecraft desde la app, con la consola en vivo y botón para detener
 - [x] Proyecto de ejemplo `examples/rubymod` que compila y abre Minecraft con el mod cargado
 - [ ] `mcgod-workspace`: guardar cambios con el mismo formato
-- [ ] `mcgod-ftl`: intérprete FreeMarker con lo que usan las plantillas reales
+- [x] `mcgod-ftl`: intérprete FreeMarker con lo que usan las plantillas reales (analiza las 2,212 plantillas de los plugins de MCreator; tres plantillas reales producen el mismo resultado que FreeMarker)
 - [ ] `mcgod-generator`: generar el tipo **Item** para NeoForge 1.21.1 (el generador LTS de MCreator)
 - [ ] Pruebas golden contra MCreator real
 

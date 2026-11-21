@@ -69,7 +69,20 @@ flowchart LR
 | `mcgod-kb` | Rust | Índice y búsqueda sobre la ayuda de MCreator + documentación propia de modding |
 | `mcgod-mcp` | Rust | Servidor MCP que expone las mismas herramientas que usa el chat integrado |
 
-Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri`, `crates/mcgod-workspace` y `crates/mcgod-gradle`.
+Las piezas se irán creando como *crates* de un workspace de Cargo conforme lleguen sus fases (ver [03-hoja-de-ruta.md](03-hoja-de-ruta.md)). Hoy existen `app/src-tauri`, `crates/mcgod-workspace`, `crates/mcgod-gradle` y `crates/mcgod-ftl`.
+
+### El intérprete de plantillas (`mcgod-ftl`)
+
+Implementa el subconjunto de FreeMarker 2.3 que usan los generadores de MCreator, medido sobre sus plantillas: `if`, `list` con `sep` y `else`, `assign`/`local`/`global` (también con captura), `macro` con `nested`, `function`/`return`, `include`, `import`, `break`, 64 built-ins (los 41 que aparecen en las plantillas y otros afines), lambdas, rangos, `!`, `??` y `?interpret`.
+
+Replica la configuración de MCreator (`DefaultFreemarkerConfiguration`):
+
+- Números con el patrón `0.##########`: hasta 10 decimales, redondeo al par, sin separador de miles.
+- Booleanos como `true`/`false` y sin escapado automático.
+- Recorte de espacios: una línea que solo tiene etiquetas o comentarios no deja rastro en la salida.
+- `<@javacompress>`: port de la directiva Java de MCreator que compacta espacios sin tocar los textos entre comillas.
+
+Los objetos del generador (`settings`, `generator`, `w`, `data`…) se exponen con el rasgo `HostObject`: propiedades y métodos, como el BeansWrapper de FreeMarker.
 
 ### Cómo se compila y se abre Minecraft
 
